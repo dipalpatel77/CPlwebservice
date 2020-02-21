@@ -8,6 +8,7 @@ package cpl;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -46,6 +47,83 @@ public class Cpl {
      * Retrieves representation of an instance of cpl.Cpl
      * @return an instance of java.lang.String
      */
+    
+    long timeStamp = System.currentTimeMillis() / 1000;
+    
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("userLogin&{userEmail}&{userPass}")
+    public String userLogin(@PathParam("userEmail") String userEmail, @PathParam("userPass") String userPass) {
+
+        Connection con = null;
+        PreparedStatement stm = null;
+        String sql = null;
+        ResultSet rs;
+        int userId=-1;
+        String dbEmail = null;
+        String dbpass = null;
+        String result = null;
+        JSONObject jsonObject = null;
+        String status = "OK";
+        String message = null;
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            //DriverManager.registerDriver(new mysql.jdbc.OracleDriver());
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+
+            sql = "Select * from User where email=?";
+            
+            stm = con.prepareStatement(sql);
+            stm.setString(1, userEmail);
+            rs = stm.executeQuery();
+
+            while (rs.next()) {
+                userId=rs.getInt(1);
+                dbEmail = rs.getString(4);
+                dbpass = rs.getString(5);
+            }
+
+            if (!rs.wasNull() && dbpass.equals(userPass)) {
+                result = "Login Successfull";
+            } else if (!rs.wasNull()) {
+                result = "Invalid Password";
+            }
+
+        } catch (SQLException ex) {
+            status = "Error";
+            result = ex.getMessage();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            jsonObject = new JSONObject();
+            jsonObject.accumulate("Status", status);
+            jsonObject.accumulate("TimeStamp", timeStamp);
+            jsonObject.accumulate("Message", result);
+            jsonObject.accumulate("User Id", userId);
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (stm != null) {
+                    try {
+                        stm.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+
+        return jsonObject.toString();
+    }
+
+    
+    
+    
+    
      @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("changePassword&{password}&{userName}&{dob}")
