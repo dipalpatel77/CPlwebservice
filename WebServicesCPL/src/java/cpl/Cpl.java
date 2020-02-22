@@ -24,6 +24,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.MediaType;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
@@ -245,5 +246,70 @@ public class Cpl {
             }
         return jsonObject.toString();
     }
+    }
+       @GET
+    @Path("showPlayerDetail&{playername}")
+    @Produces("application/json")
+    public String showPlayerDetail(@PathParam("userId") int userId) {
+        //TODO return proper representation object
+        System.out.println("showPlayerDetail");
+        String msg;
+        Connection con = null;
+        JSONObject singleObject = new JSONObject();
+        JSONObject firstObject = new JSONObject();
+        JSONArray mainArray = new JSONArray();
+        PreparedStatement stmt = null;
+        String status = "OK";
+        String message = null;
+        String sql;
+        ResultSet rs;
+
+        try {
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+            // System.out.println("Succesfully connected");
+
+            sql = "SELECT playerId,R.SOURCELOCATION,R.DESTINATION,R.RIDEDATE,R.EXTRADETAILS,U.FIRSTNAME,U.CONTACTNO,V.VEHICLETYPE,V.SEATSAVAILABLE FROM RIDE  R,USERDETAILS  U,VEHICLEdetail  V where U.USERID=R.USERID And V.VEHICLEID=R.VEHICLEID and U.userid!=" + userId;
+            stmt = con.prepareStatement(sql);
+
+            rs = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+                message = "player Info";
+                singleObject.accumulate("playerId", rs.getInt("playerId"));
+                singleObject.accumulate("Player Name", rs.getString("name"));
+                singleObject.accumulate("Destination", rs.getDate("dob"));
+                singleObject.accumulate("role", rs.getString("role"));
+                singleObject.accumulate("birthPlace", rs.getString("birthplace"));
+            }
+
+        } catch (Exception ex) {
+            status = "Error";
+            message = ex.getMessage();
+
+        } finally {
+            firstObject = new JSONObject();
+            firstObject.accumulate("Status", status);
+            firstObject.accumulate("Check", userId);
+            firstObject.accumulate("TimeStamp", timeStamp);
+            firstObject.accumulate("Message", message);
+            firstObject.accumulate("player info", mainArray);
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (stmt != null) {
+                    try {
+                        stmt.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+
+        return singleObject.toString();
+
     }
 }
