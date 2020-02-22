@@ -312,4 +312,64 @@ public class Cpl {
         return singleObject.toString();
 
     }
+    
+     //update team informtion
+    
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("updateTeam&{teamId}&{name}&{color}&{leagueManagerId}&{teamManagerId}")
+    public String InsertTeam(@PathParam("teamId") int teamId,@PathParam("name") String name,@PathParam("color") String color,
+                            @PathParam("teamManagerId") int teamManagerId)
+                      {
+        //TODO return proper representation object
+        String msg;
+        Connection conn = null;
+        JSONObject firstObject = new JSONObject();
+        Date cd = new Date();
+        long epoch = cd.getTime();
+        int ts = (int) (epoch / 1000);
+        System.out.println("Current Time Stamp: " + ts);
+        PreparedStatement stmt = null;
+
+        try {
+
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+            //System.out.println(conn)
+            String sql;
+            sql = "update Team set name=?,color=?,teamManagerId=? where teamId=?";
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, name);
+            stmt.setString(2, color);
+            stmt.setInt(3, teamManagerId);
+            stmt.setInt(4, teamId);
+            int rs = stmt.executeUpdate();
+            firstObject.accumulate("Status", "Ok");
+            firstObject.accumulate("TimeStamp ", ts);
+            if (rs > 0) {
+                msg = rs + " Record have successfully been updated.";
+                firstObject.accumulate("message : ", msg);
+            } else {
+                msg = rs + " No record updated.";
+                firstObject.accumulate("message : ", msg);
+            }
+
+        } catch (Exception ex) {
+            msg = ex.getMessage();
+            firstObject.accumulate("Status", "Error");
+            firstObject.accumulate("TimeStamp ", ts);
+            firstObject.accumulate("Message :", msg);
+
+        } finally {
+            try {
+                conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(TeamWebService.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+
+        return firstObject.toString();
+    }
+
 }
