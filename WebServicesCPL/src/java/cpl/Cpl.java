@@ -364,7 +364,7 @@ public class Cpl {
             try {
                 conn.close();
             } catch (SQLException ex) {
-                Logger.getLogger(TeamWebService.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
             }
 
         }
