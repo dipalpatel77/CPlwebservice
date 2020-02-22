@@ -121,6 +121,72 @@ public class LeagueManager {
         return jsonObj.toString();
     }
     
+      // Insert team information
+   
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("insertTeam&{name}&{color}&{leagueManagerId}&{teamManagerId}")
+
+    public String InsertTeam(@PathParam("name") String name,@PathParam("color") String color,
+                            @PathParam("leagueManagerId") int leagueManagerId,
+                            @PathParam("teamManagerId") int teamManagerId) {
+        //TODO return proper representation object
+        Connection conn = null;
+        JSONObject firstObject = new JSONObject();
+        PreparedStatement stmt = null;
+        String sql;
+        String status = "OK";
+        String message = null;
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+            sql = "insert into Team(name,color,leagueManagerId,teamManagerId)values(?,?,?,?)";
+            stmt = conn.prepareStatement(sql);
+            //stmt.setInt(1, 1);
+            stmt.setString(1,name);
+            stmt.setString(2,color);
+            stmt.setInt(3,leagueManagerId);
+            stmt.setInt(4,teamManagerId);
+            
+            int rs = stmt.executeUpdate();
+            firstObject.accumulate("Status", "Ok");
+            firstObject.accumulate("TimeStamp ", timeStamp);
+
+            if (rs > 0) {
+                message = rs + " Record(s) have been successfully inserted.";
+                firstObject.accumulate("message : ", message);
+            } else {
+                message = rs + " No record Inserted.";
+                firstObject.accumulate("message : ", message);
+            }
+        } catch (Exception ex) {
+            status = "Error";
+            message = ex.getMessage();
+        } finally {
+            firstObject = new JSONObject();
+            firstObject.accumulate("Status", status);
+            firstObject.accumulate("TimeStamp", timeStamp);
+            firstObject.accumulate("Message", message);
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (stmt != null) {
+                    try {
+                        stmt.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+
+        return firstObject.toString();
+    }
+    
     
     
 }
