@@ -416,11 +416,11 @@ public class Cpl {
             }
 
         } catch (SQLException ex) {
-             Logger.getLogger(Feedback.class.getName()).log(Level.SEVERE, null, ex);
+             Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
              System.out.println(ex);
             
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Feedback.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
      
             jsonObject.accumulate("Status", status);
@@ -431,13 +431,13 @@ public class Cpl {
                 try {
                     con.close();
                 } catch (SQLException ex) {
-                    Logger.getLogger(Feedback.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 if (stm != null) {
                     try {
                         stm.close();
                     } catch (SQLException ex) {
-                        Logger.getLogger(Feedback.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             }
