@@ -598,4 +598,77 @@ public class Cpl {
 
         return jsonObject.toString();
     }
-}
+          @GET
+    @Path("showPlayersbyTeam&{teamname}")
+    @Produces("application/json")
+    public String showPlayerbyTeam(@PathParam("teamName") String teamname ) {
+      
+          Connection con = null;
+        PreparedStatement stm = null;
+        String sql = null;
+        ResultSet rs;
+        int userId=-1;
+        String name = null;
+        int player = 0;
+        JSONObject jsonObject = new JSONObject();
+        JSONObject singleObject = new JSONObject();
+        Date  dob;
+        String result = null;
+        String status = "OK";
+        String birthplace = null;
+        String teamName = null; 
+        
+        
+
+        try {
+            //Class.forName("com.mysql.jdbc.Driver");
+            //DriverManager.registerDriver(new mysql.jdbc.OracleDriver());
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+
+            sql = "Select name from players join teamplayer on teamplayer.playerid = player.playerid  where  team id = ";
+            stm = con.prepareStatement(sql);
+            stm.setString(1, name);
+            rs = stm.executeQuery();
+        
+        
+            
+            while (rs.next()) {
+                singleObject.accumulate("player", rs.getInt(1));
+                name = rs.getString(2);
+                dob = rs.getDate(3);
+                birthplace = rs.getString(4);
+                teamName = rs.getString(5);
+                
+                
+            }
+
+          
+        } catch (SQLException ex) {
+            status = "Error";
+            result = ex.getMessage();
+        } finally {
+            jsonObject = new JSONObject();
+            jsonObject.accumulate("Status", status);
+            jsonObject.accumulate("TimeStamp", timeStamp);
+            jsonObject.accumulate("Message", result);
+            jsonObject.accumulate("User Id", userId);
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (stm != null) {
+                    try {
+                        stm.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+
+        return jsonObject.toString();
+    }
+ }
+
