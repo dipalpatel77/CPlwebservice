@@ -29,7 +29,7 @@ import net.sf.json.JSONObject;
  * @author hp
  */
 @Path("leagueManager")
-public class LeagueManager {
+public class LeagueManager extends DbConnection{
 
     @Context
     private UriInfo context;
@@ -43,8 +43,8 @@ public class LeagueManager {
      long timeStamp = System.currentTimeMillis() / 1000;
     
     /**
-     * Retrieves representation of an instance of cpl.LeagueManager
-     * @return an instance of java.lang.String
+     * Retrieves representation of an instance of .LeagueManager
+     * @return an instance of java.String
      */
     @GET
     @Produces("application/json")
@@ -61,24 +61,19 @@ public class LeagueManager {
             @PathParam("startDate") String startDate,
             @PathParam("endDate") String endDate, 
             @PathParam("description") String description,
-            @PathParam("leagueManagerId") int leagueManagerId) {
+            @PathParam("leagueManagerId") int leagueManagerId) throws ClassNotFoundException, SQLException {
         //TODO return proper representation object
 
         PreparedStatement stm = null;
         JSONObject jsonObj = null;
         String sql;
-        Connection con = null;
         String status = "OK";
         String message = null;
 
         try {
             
-             Class.forName("com.mysql.jdbc.Driver");
-            //DriverManager.registerDriver(new mysql.jdbc.OracleDriver());
-            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
-            
             sql = "insert into Season (seasonTitle,startDate,endDate,description,leagueManagerId) values(?,?,?,?,?)";
-            stm = con.prepareStatement(sql);
+            stm = con().prepareStatement(sql);
 
             stm.setString(1, seasonTitle);
             stm.setString(2, startDate);
@@ -96,17 +91,15 @@ public class LeagueManager {
             status = "Error";
             message = ex.getMessage();
 
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             jsonObj = new JSONObject();
             jsonObj.accumulate("Status", status);
             jsonObj.accumulate("TimeStamp", timeStamp);
             jsonObj.accumulate("Message", message);
 
-            if (con != null) {
+            if (con() != null) {
                 try {
-                    con.close();
+                    con().close();
                 } catch (SQLException ex) {
                     Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -130,20 +123,19 @@ public class LeagueManager {
 
     public String InsertTeam(@PathParam("name") String name,@PathParam("color") String color,
                             @PathParam("leagueManagerId") int leagueManagerId,
-                            @PathParam("teamManagerId") int teamManagerId) {
+                            @PathParam("teamManagerId") int teamManagerId) throws ClassNotFoundException, SQLException {
         //TODO return proper representation object
-        Connection conn = null;
+       
         JSONObject firstObject = new JSONObject();
         PreparedStatement stmt = null;
         String sql;
         String status = "OK";
         String message = null;
 
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+        try 
+        {  
             sql = "insert into Team(name,color,leagueManagerId,teamManagerId)values(?,?,?,?)";
-            stmt = conn.prepareStatement(sql);
+            stmt = con().prepareStatement(sql);
             //stmt.setInt(1, 1);
             stmt.setString(1,name);
             stmt.setString(2,color);
@@ -169,9 +161,9 @@ public class LeagueManager {
             firstObject.accumulate("Status", status);
             firstObject.accumulate("TimeStamp", timeStamp);
             firstObject.accumulate("Message", message);
-            if (conn != null) {
+            if (con()!= null) {
                 try {
-                    conn.close();
+                    con().close();
                 } catch (SQLException ex) {
                     Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -193,9 +185,9 @@ public class LeagueManager {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("deleteTeam&{teamId}")
-    public String DeleteTeam(@PathParam("teamId") int teamId) {
+    public String DeleteTeam(@PathParam("teamId") int teamId) throws ClassNotFoundException, SQLException {
 
-        Connection con = null;
+        
         PreparedStatement stm = null;
         String sql = null;
         ResultSet rs=null;
@@ -206,12 +198,9 @@ public class LeagueManager {
        
 
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            //DriverManager.registerDriver(new mysql.jdbc.OracleDriver());
-            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
-
+            
             sql = "Delete from Team where teamId=?";
-            stm = con.prepareStatement(sql);
+            stm = con().prepareStatement(sql);
             stm.setInt(1, teamId);
             stm.execute();        
         
@@ -226,9 +215,9 @@ public class LeagueManager {
             jsonObject.accumulate("Status", status);
             jsonObject.accumulate("TimeStamp", timeStamp);
             jsonObject.accumulate("Message", result);
-            if (con != null) {
+            if (con() != null) {
                 try {
-                    con.close();
+                    con().close();
                 } catch (SQLException ex) {
                     Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
                 }
