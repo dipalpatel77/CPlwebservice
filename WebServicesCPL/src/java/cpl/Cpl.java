@@ -371,5 +371,231 @@ public class Cpl {
 
         return firstObject.toString();
     }
+    
+       @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("viewFeedback")
+    public String ViewFeedback() {
 
+        Connection con = null;
+        PreparedStatement stm = null;
+        String sql = null;
+        ResultSet rs;
+        String result = null;
+        JSONObject jsonObject = new JSONObject();
+        String status = "OK";
+        String message = null;
+        JSONObject mainObject=new JSONObject();
+        JSONArray list = new JSONArray();
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+
+            sql = "Select * from Feedback";
+            stm= con.prepareStatement(sql);
+            rs = stm.executeQuery();
+            
+          
+            while (rs.next()) {
+
+                int feedbackId = rs.getInt("feedbackId");
+                String title = rs.getString("title");
+                String description = rs.getString("description");
+                String email = rs.getString("email");
+              
+              
+                mainObject.accumulate("feedbackId", feedbackId);
+                mainObject.accumulate("title", title);
+                mainObject.accumulate("description", description);
+                mainObject.accumulate("email", email);
+                System.out.println(mainObject);
+                list.add(mainObject);
+                mainObject.clear(); 
+
+            }
+
+        } catch (SQLException ex) {
+             Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+             System.out.println(ex);
+            
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+     
+            jsonObject.accumulate("Status", status);
+            jsonObject.accumulate("Message", result);
+            jsonObject.accumulate("String", list);
+           
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (stm != null) {
+                    try {
+                        stm.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+
+        return jsonObject.toString();
+    }    
+    
+@GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("viewSchedule")
+    public String ViewSchedule() {
+
+        Connection con = null;
+        PreparedStatement stm = null;
+        String sql = null;
+        ResultSet rs;
+        String result = null;
+        JSONObject jsonObject = new JSONObject();
+        String status = "OK";
+        String message = null;
+        JSONObject mainObject=new JSONObject();
+        JSONArray list = new JSONArray();
+
+        try {
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+
+            sql = "Select * from Schedule";
+            stm= con.prepareStatement(sql);
+            rs = stm.executeQuery();
+            
+          
+            while (rs.next()) {
+
+                int scheduleId = rs.getInt("scheduleId");
+                String matchName = rs.getString("matchName");
+                String teamA = rs.getString("teamA");
+                String teamB = rs.getString("teamB");
+                String date = rs.getString("Date");
+                String venue = rs.getString("venue");
+                int currentMatchId = rs.getInt("currentMatchId");
+                int teamId = rs.getInt("teamId");
+              
+                mainObject.accumulate("scheduleId", scheduleId);
+                mainObject.accumulate("matchName", matchName);
+                mainObject.accumulate("teamA", teamA);
+                mainObject.accumulate("teamB", teamB);
+                mainObject.accumulate("Date", date);
+                mainObject.accumulate("venue", venue);
+                mainObject.accumulate("currentMatchId", currentMatchId);
+                mainObject.accumulate("teamId", teamId);
+                System.out.println(mainObject);
+                list.add(mainObject);
+                mainObject.clear(); 
+
+            }
+
+        } catch (Exception ex) {
+            // Logger.getLogger(Feedback.class.getName()).log(Level.SEVERE, null, ex);
+             System.out.println(ex.getCause());
+            
+        } finally {
+     
+            jsonObject.accumulate("Status", status);
+            jsonObject.accumulate("Message", result);
+            jsonObject.accumulate("String", list);
+           
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (stm != null) {
+                    try {
+                        stm.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+
+        return jsonObject.toString();
+    } 
+    
+     @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("viewTeam")
+    public String ViewTeam() {
+
+        Connection con = null;
+        PreparedStatement stm = null;
+        String sql = null;
+        ResultSet rs;
+        String result = null;
+        JSONObject singleObject=new JSONObject();
+        JSONObject jsonObject = new JSONObject();
+         JSONArray jsonarry=new JSONArray();
+        String status = "OK";
+        String message = null;
+        String name=null;
+        String color=null;
+        int teamManagerId;
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            //DriverManager.registerDriver(new mysql.jdbc.OracleDriver());
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+
+            sql = "Select * from Team";
+            stm = con.prepareStatement(sql);
+            rs = stm.executeQuery();
+
+            while (rs.next()) {
+              //  System.out.println(rs.toString());
+                singleObject.accumulate("teamId", rs.getString("teamId"));
+               singleObject.accumulate("name", rs.getString("name"));
+               singleObject.accumulate("color", rs.getString("color"));
+               singleObject.accumulate("leagueManagerId", rs.getString("leagueManagerId"));
+               singleObject.accumulate("teamManagerId", rs.getInt("teamManagerId"));
+                jsonarry.add(singleObject);
+                singleObject.clear();
+
+            }
+
+        } catch (SQLException ex) {
+            status = "Error";
+            result = ex.getMessage();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            jsonObject = new JSONObject();
+            jsonObject.accumulate("Status", status);
+            jsonObject.accumulate("TimeStamp", timeStamp);
+            jsonObject.accumulate("Message", result);
+            jsonObject.accumulate("String", jsonarry);   
+            
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (stm != null) {
+                    try {
+                        stm.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+
+        return jsonObject.toString();
+    }
 }
