@@ -8,6 +8,7 @@ package cpl;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -187,6 +188,62 @@ public class LeagueManager {
         return firstObject.toString();
     }
     
+   //Delete Team Information
     
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("deleteTeam&{teamId}")
+    public String DeleteTeam(@PathParam("teamId") int teamId) {
+
+        Connection con = null;
+        PreparedStatement stm = null;
+        String sql = null;
+        ResultSet rs=null;
+        String result = null;
+        JSONObject jsonObject = null;
+        String status = "OK";
+        String message = null;
+       
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            //DriverManager.registerDriver(new mysql.jdbc.OracleDriver());
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+
+            sql = "Delete from Team where teamId=?";
+            stm = con.prepareStatement(sql);
+            stm.setInt(1, teamId);
+            stm.execute();        
+        
+
+        } catch (SQLException ex) {
+            status = "Error";
+            result = ex.getMessage();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            jsonObject = new JSONObject();
+            jsonObject.accumulate("Status", status);
+            jsonObject.accumulate("TimeStamp", timeStamp);
+            jsonObject.accumulate("Message", result);
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (stm != null) {
+                    try {
+                        stm.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+
+        return jsonObject.toString();
+    }
+
     
 }
