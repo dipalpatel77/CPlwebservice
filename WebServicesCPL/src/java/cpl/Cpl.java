@@ -49,7 +49,7 @@ public class Cpl extends DbConnection {
 
             while (rs.next()) {
                 userId = rs.getInt("userId");
-                message = "Login Successsfull";
+                message = "Login Successfull";
             }
 
         } catch (SQLException ex) {

@@ -8,11 +8,8 @@ package cpl;
 import java.util.Set;
 import javax.ws.rs.core.Application;
 
-/**
- *
- * @author dipal
- */
-@javax.ws.rs.ApplicationPath("webresources")
+
+@javax.ws.rs.ApplicationPath("cpl")
 public class ApplicationConfig extends Application {
 
     @Override

@@ -5,64 +5,31 @@
  */
 package cpl;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PUT;
 import javax.ws.rs.core.MediaType;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-/**
- * REST Web Service
- *
- * @author hp
- */
 @Path("leagueManager")
-public class LeagueManager extends DbConnection{
+public class LeagueManager extends DbConnection {
 
-    @Context
-    private UriInfo context;
+    private final long timeStamp = System.currentTimeMillis() / 1000;
 
-    /**
-     * Creates a new instance of LeagueManager
-     */
-    public LeagueManager() {
-    }
-
-     long timeStamp = System.currentTimeMillis() / 1000;
-    
-    /**
-     * Retrieves representation of an instance of .LeagueManager
-     * @return an instance of java.String
-     */
     @GET
-    @Produces("application/json")
-    public String getJson() {
-        //TODO return proper representation object
-        throw new UnsupportedOperationException();
-    }
-
-   // Create Season
-    @GET
-    @Path("createSeason&{seasonTitle}&{startDate}&{endDate}&{description}&{leagueManagerId}")
+    @Path("createSeason&{seasonTitle}&{startDate}&{endDate}&{description}")
     @Produces(MediaType.APPLICATION_JSON)
     public String createSeason(@PathParam("seasonTitle") String seasonTitle,
             @PathParam("startDate") String startDate,
-            @PathParam("endDate") String endDate, 
-            @PathParam("description") String description,
-            @PathParam("leagueManagerId") int leagueManagerId) throws ClassNotFoundException, SQLException {
-        //TODO return proper representation object
+            @PathParam("endDate") String endDate,
+            @PathParam("description") String description) {
 
         PreparedStatement stm = null;
         JSONObject jsonObj = null;
@@ -71,15 +38,12 @@ public class LeagueManager extends DbConnection{
         String message = null;
 
         try {
-            
-            sql = "insert into Season (seasonTitle,startDate,endDate,description,leagueManagerId) values(?,?,?,?,?)";
+            sql = "insert into Season (seasonTitle,startDate,endDate,description) values(?,?,?,?)";
             stm = con().prepareStatement(sql);
-
             stm.setString(1, seasonTitle);
             stm.setString(2, startDate);
             stm.setString(3, endDate);
             stm.setString(4, description);
-            stm.setInt(5, leagueManagerId);
 
             int rs = stm.executeUpdate();
 
@@ -114,54 +78,43 @@ public class LeagueManager extends DbConnection{
         }
         return jsonObj.toString();
     }
-    
-      // Insert team information
-   
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("insertTeam&{name}&{color}&{leagueManagerId}&{teamManagerId}")
+    @Path("createTeam&{teamName}&{teamColor}&{teamManagerId}")
+    public String createTeam(@PathParam("teamName") String teamName,
+            @PathParam("teamColor") String teamColor,
+            @PathParam("teamManagerId") int teamManagerId) {
 
-    public String InsertTeam(@PathParam("name") String name,@PathParam("color") String color,
-                            @PathParam("leagueManagerId") int leagueManagerId,
-                            @PathParam("teamManagerId") int teamManagerId) throws ClassNotFoundException, SQLException {
-        //TODO return proper representation object
-       
-        JSONObject firstObject = new JSONObject();
+        JSONObject jsonObject = null;
         PreparedStatement stmt = null;
         String sql;
         String status = "OK";
         String message = null;
 
-        try 
-        {  
-            sql = "insert into Team(name,color,leagueManagerId,teamManagerId)values(?,?,?,?)";
+        try {
+            sql = "insert into Team (teamName,teamColor,teamManagerId) values(?,?,?)";
             stmt = con().prepareStatement(sql);
-            //stmt.setInt(1, 1);
-            stmt.setString(1,name);
-            stmt.setString(2,color);
-            stmt.setInt(3,leagueManagerId);
-            stmt.setInt(4,teamManagerId);
-            
+            stmt.setString(1, teamName);
+            stmt.setString(2, teamColor);
+            stmt.setInt(3, teamManagerId);
+
             int rs = stmt.executeUpdate();
-            firstObject.accumulate("Status", "Ok");
-            firstObject.accumulate("TimeStamp ", timeStamp);
 
             if (rs > 0) {
                 message = rs + " Record(s) have been successfully inserted.";
-                firstObject.accumulate("message : ", message);
             } else {
                 message = rs + " No record Inserted.";
-                firstObject.accumulate("message : ", message);
             }
         } catch (Exception ex) {
             status = "Error";
             message = ex.getMessage();
         } finally {
-            firstObject = new JSONObject();
-            firstObject.accumulate("Status", status);
-            firstObject.accumulate("TimeStamp", timeStamp);
-            firstObject.accumulate("Message", message);
-            if (con()!= null) {
+            jsonObject = new JSONObject();
+            jsonObject.accumulate("Status", status);
+            jsonObject.accumulate("TimeStamp", timeStamp);
+            jsonObject.accumulate("Message", message);
+            if (con() != null) {
                 try {
                     con().close();
                 } catch (SQLException ex) {
@@ -176,45 +129,40 @@ public class LeagueManager extends DbConnection{
                 }
             }
         }
-
-        return firstObject.toString();
+        return jsonObject.toString();
     }
-    
-   //Delete Team Information
-    
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("deleteTeam&{teamId}")
-    public String DeleteTeam(@PathParam("teamId") int teamId) throws ClassNotFoundException, SQLException {
+    public String deleteTeam(@PathParam("teamId") int teamId) {
 
-        
         PreparedStatement stm = null;
         String sql = null;
-        ResultSet rs=null;
-        String result = null;
         JSONObject jsonObject = null;
         String status = "OK";
         String message = null;
-       
 
         try {
-            
             sql = "Delete from Team where teamId=?";
             stm = con().prepareStatement(sql);
             stm.setInt(1, teamId);
-            stm.execute();        
-        
+            int rs = stm.executeUpdate();
+
+            if (rs > 0) {
+                message = rs + " Record(s) have been successfully deleted.";
+            } else {
+                message = rs + " No record Deleted.";
+            }
 
         } catch (SQLException ex) {
             status = "Error";
-            result = ex.getMessage();
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
+            message = ex.getMessage();
         } finally {
             jsonObject = new JSONObject();
             jsonObject.accumulate("Status", status);
             jsonObject.accumulate("TimeStamp", timeStamp);
-            jsonObject.accumulate("Message", result);
+            jsonObject.accumulate("Message", message);
             if (con() != null) {
                 try {
                     con().close();
@@ -230,9 +178,67 @@ public class LeagueManager extends DbConnection{
                 }
             }
         }
-
         return jsonObject.toString();
     }
 
-    
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("viewFeedback")
+    public String viewFeedback() {
+
+        PreparedStatement stm = null;
+        String sql = null;
+        ResultSet rs;
+        JSONObject jsonObject = null;
+        String status = "OK";
+        String message = null;
+        JSONObject singleObject = null;
+        JSONArray list = null;
+
+        try {
+            sql = "Select * from Feedback";
+            stm = con().prepareStatement(sql);
+            rs = stm.executeQuery();
+
+            singleObject = new JSONObject();
+            list = new JSONArray();
+            while (rs.next()) {
+                singleObject.accumulate("feedbackId", rs.getInt("feedbackId"));
+                singleObject.accumulate("title", rs.getString("title"));
+                singleObject.accumulate("description", rs.getString("description"));
+                singleObject.accumulate("email", rs.getString("email"));
+                System.out.println(singleObject);
+                list.add(singleObject);
+                singleObject.clear();
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+            message = ex.getMessage();
+            status = "Error";
+        } finally {
+            jsonObject = new JSONObject();
+            jsonObject.accumulate("Status", status);
+            jsonObject.accumulate("TimeStamp", timeStamp);
+            jsonObject.accumulate("Message", message);
+            jsonObject.accumulate("Feedbacks", list);
+
+            if (con() != null) {
+                try {
+                    con().close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (stm != null) {
+                    try {
+                        stm.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+
+        return jsonObject.toString();
+    }
 }
