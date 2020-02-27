@@ -303,6 +303,7 @@ public class LeagueManager extends DbConnection {
                         stm.close();
                     } catch (SQLException ex) {
                         Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
+                  
                     }
                 }
             }
