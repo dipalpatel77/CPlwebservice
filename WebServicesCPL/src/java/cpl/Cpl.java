@@ -529,4 +529,71 @@ public class Cpl extends DbConnection {
         }
         return jsonObject.toString();
     }
+    
+    //viewSchedule
+    @GET
+    @Path("viewSchedule")
+    @Produces("application/json")
+    public String viewSchedule() {
+       
+        PreparedStatement stm = null;
+        String sql = null;
+        ResultSet rs;
+        String result = null;
+        JSONObject singleObject=new JSONObject();
+        JSONObject jsonObject = new JSONObject();
+         JSONArray jsonarry=new JSONArray();
+        String status = "OK";
+        String message = null;
+        
+        try {
+           
+            sql = "Select * from Schedule";
+            stm = con().prepareStatement(sql);
+            rs = stm.executeQuery();
+
+            while (rs.next()) {
+
+                singleObject.accumulate("Team A", rs.getString("teamA"));
+               singleObject.accumulate("Team B", rs.getString("TeamB"));
+               singleObject.accumulate("Date", rs.getString("date"));
+               singleObject.accumulate("Venue", rs.getString("venue"));
+               singleObject.accumulate("Result", rs.getString("result"));
+               singleObject.accumulate("Ressult Description", rs.getString("resultDescription"));
+               
+                jsonarry.add(singleObject);
+                singleObject.clear();
+            }
+
+        } catch (SQLException ex) {
+            status = "Error";
+            result = ex.getMessage();
+         } 
+        
+        finally {
+            jsonObject = new JSONObject();
+            jsonObject.accumulate("Status", status);
+            jsonObject.accumulate("TimeStamp", timeStamp);
+            jsonObject.accumulate("Message", result);
+            jsonObject.accumulate("String", jsonarry);  
+           
+            if (con() != null) {
+                try {
+                    con().close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (stm != null) {
+                    try {
+                        stm.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+
+        return jsonObject.toString();
+    }
+
 }

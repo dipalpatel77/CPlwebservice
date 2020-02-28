@@ -244,16 +244,15 @@ public class LeagueManager extends DbConnection {
     
     // Create Schedule
     @GET
-    @Path("createSchedule&{scheduleId}&{teamA}&{teamB}&{date}&{venue}&{result}&{resultDescription}&{seasonId}")
+    @Path("createSchedule&{teamA}&{teamB}&{date}&{venue}&{result}&{resultDescription}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String createSeason(@PathParam("scheduleId") int scheduleId,
+    public String createSeason(
             @PathParam("teamA") String teamA,
             @PathParam("teamB") String teamB,
             @PathParam("date") String date, 
             @PathParam("venue") String venue,
             @PathParam("result") String result,
-            @PathParam("resultDescription") String resultDescription,
-            @PathParam("seasonId") int seasonId)
+            @PathParam("resultDescription") String resultDescription)
           {
 
         PreparedStatement stm = null;
@@ -264,17 +263,17 @@ public class LeagueManager extends DbConnection {
 
         try {
             
-            sql = "insert into Schedule (scheduleId,teamA,teamB,date,venue,result,resultDescription,seasonId) values(?,?,?,?,?,?,?,?)";
+            sql = "insert into Schedule (teamA,teamB,date,venue,result,resultDescription) values(?,?,?,?,?,?)";
             stm = con().prepareStatement(sql);
 
-            stm.setInt(1,scheduleId);
-            stm.setString(2,teamA);
-            stm.setString(3,teamB);
-            stm.setString(4,date);
-            stm.setString(5,venue);
-            stm.setString(6,result);
-            stm.setString(7,resultDescription);
-            stm.setInt(8,seasonId);
+           // stm.setInt(1,scheduleId);
+            stm.setString(1,teamA);
+            stm.setString(2,teamB);
+            stm.setString(3,date);
+            stm.setString(4,venue);
+            stm.setString(5,result);
+            stm.setString(6,resultDescription);
+          //  stm.setInt(8,seasonId);
 
             int rs = stm.executeUpdate();
 
