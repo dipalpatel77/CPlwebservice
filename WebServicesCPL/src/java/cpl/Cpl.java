@@ -208,6 +208,7 @@ public class Cpl extends DbConnection {
 
             singleObject = new JSONObject();
             while (rs.next()) {
+                message = "Available";
                 singleObject.accumulate("playerId", rs.getInt("playerId"));
                 singleObject.accumulate("PlayerName", rs.getString("playerName"));
                 singleObject.accumulate("BirthDate", rs.getString("dob"));
@@ -316,6 +317,7 @@ public class Cpl extends DbConnection {
             mainObject = new JSONObject();
             list = new JSONArray();
             while (rs.next()) {
+                message = "Available";
                 mainObject.accumulate("scheduleId", rs.getInt("scheduleId"));
                 mainObject.accumulate("teamA", rs.getString("teamA"));
                 mainObject.accumulate("teamB", rs.getString("teamB"));
@@ -380,6 +382,7 @@ public class Cpl extends DbConnection {
             singleObject = new JSONObject();
             jsonarry = new JSONArray();
             while (rs.next()) {
+                message = "Available";
                 singleObject.accumulate("teamId", rs.getString("teamId"));
                 singleObject.accumulate("teamName", rs.getString("teamName"));
                 singleObject.accumulate("teamColor", rs.getString("teamColor"));
@@ -439,6 +442,7 @@ public class Cpl extends DbConnection {
             list = new JSONArray();
 
             while (rs.next()) {
+                message = "Available";
                 singleObject.accumulate("playerId", rs.getString("playerId"));
                 singleObject.accumulate("name", rs.getString("playerName"));
                 list.add(singleObject);
@@ -494,6 +498,7 @@ public class Cpl extends DbConnection {
             singleObject = new JSONObject();
             jsonArray = new JSONArray();
             while (rs.next()) {
+                message = "Available";
                 singleObject.accumulate("Season Title", rs.getString("seasonTitle"));
                 singleObject.accumulate("Description", rs.getString("description"));
                 singleObject.accumulate("Start Date", rs.getString("startDate"));
@@ -529,38 +534,38 @@ public class Cpl extends DbConnection {
         }
         return jsonObject.toString();
     }
-    
+
     //viewSchedule
     @GET
     @Path("viewSchedule")
     @Produces("application/json")
     public String viewSchedule() {
-       
+
         PreparedStatement stm = null;
         String sql = null;
         ResultSet rs;
         String result = null;
-        JSONObject singleObject=new JSONObject();
+        JSONObject singleObject = new JSONObject();
         JSONObject jsonObject = new JSONObject();
-         JSONArray jsonarry=new JSONArray();
+        JSONArray jsonarry = new JSONArray();
         String status = "OK";
         String message = null;
-        
+
         try {
-           
+
             sql = "Select * from Schedule";
             stm = con().prepareStatement(sql);
             rs = stm.executeQuery();
 
             while (rs.next()) {
-
+                message = "Available";
                 singleObject.accumulate("Team A", rs.getString("teamA"));
-               singleObject.accumulate("Team B", rs.getString("TeamB"));
-               singleObject.accumulate("Date", rs.getString("date"));
-               singleObject.accumulate("Venue", rs.getString("venue"));
-               singleObject.accumulate("Result", rs.getString("result"));
-               singleObject.accumulate("Ressult Description", rs.getString("resultDescription"));
-               
+                singleObject.accumulate("Team B", rs.getString("TeamB"));
+                singleObject.accumulate("Date", rs.getString("date"));
+                singleObject.accumulate("Venue", rs.getString("venue"));
+                singleObject.accumulate("Result", rs.getString("result"));
+                singleObject.accumulate("Ressult Description", rs.getString("resultDescription"));
+
                 jsonarry.add(singleObject);
                 singleObject.clear();
             }
@@ -568,15 +573,13 @@ public class Cpl extends DbConnection {
         } catch (SQLException ex) {
             status = "Error";
             result = ex.getMessage();
-         } 
-        
-        finally {
+        } finally {
             jsonObject = new JSONObject();
             jsonObject.accumulate("Status", status);
             jsonObject.accumulate("TimeStamp", timeStamp);
             jsonObject.accumulate("Message", result);
-            jsonObject.accumulate("String", jsonarry);  
-           
+            jsonObject.accumulate("String", jsonarry);
+
             if (con() != null) {
                 try {
                     con().close();

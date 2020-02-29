@@ -203,6 +203,7 @@ public class LeagueManager extends DbConnection {
             singleObject = new JSONObject();
             list = new JSONArray();
             while (rs.next()) {
+                message = "Available";
                 singleObject.accumulate("feedbackId", rs.getInt("feedbackId"));
                 singleObject.accumulate("title", rs.getString("title"));
                 singleObject.accumulate("description", rs.getString("description"));
@@ -241,7 +242,7 @@ public class LeagueManager extends DbConnection {
 
         return jsonObject.toString();
     }
-    
+
     // Create Schedule
     @GET
     @Path("createSchedule&{teamA}&{teamB}&{date}&{venue}&{result}&{resultDescription}")
@@ -249,11 +250,10 @@ public class LeagueManager extends DbConnection {
     public String createSeason(
             @PathParam("teamA") String teamA,
             @PathParam("teamB") String teamB,
-            @PathParam("date") String date, 
+            @PathParam("date") String date,
             @PathParam("venue") String venue,
             @PathParam("result") String result,
-            @PathParam("resultDescription") String resultDescription)
-          {
+            @PathParam("resultDescription") String resultDescription) {
 
         PreparedStatement stm = null;
         JSONObject jsonObj = null;
@@ -262,18 +262,18 @@ public class LeagueManager extends DbConnection {
         String message = null;
 
         try {
-            
+
             sql = "insert into Schedule (teamA,teamB,date,venue,result,resultDescription) values(?,?,?,?,?,?)";
             stm = con().prepareStatement(sql);
 
-           // stm.setInt(1,scheduleId);
-            stm.setString(1,teamA);
-            stm.setString(2,teamB);
-            stm.setString(3,date);
-            stm.setString(4,venue);
-            stm.setString(5,result);
-            stm.setString(6,resultDescription);
-          //  stm.setInt(8,seasonId);
+            // stm.setInt(1,scheduleId);
+            stm.setString(1, teamA);
+            stm.setString(2, teamB);
+            stm.setString(3, date);
+            stm.setString(4, venue);
+            stm.setString(5, result);
+            stm.setString(6, resultDescription);
+            //  stm.setInt(8,seasonId);
 
             int rs = stm.executeUpdate();
 
@@ -302,12 +302,12 @@ public class LeagueManager extends DbConnection {
                         stm.close();
                     } catch (SQLException ex) {
                         Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
-                  
+
                     }
                 }
             }
         }
         return jsonObj.toString();
     }
-    
+
 }
