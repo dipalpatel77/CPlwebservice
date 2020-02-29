@@ -48,7 +48,7 @@ public class LeagueManager extends DbConnection {
             int rs = stm.executeUpdate();
 
             if (rs > 0) {
-                message = rs + " Records have successfully been inserted.";
+                message = " Records have successfully been inserted.";
                 status = "ok";
             }
         } catch (SQLException ex) {
@@ -102,9 +102,9 @@ public class LeagueManager extends DbConnection {
             int rs = stmt.executeUpdate();
 
             if (rs > 0) {
-                message = rs + " Record(s) have been successfully inserted.";
+                message =  " Record(s) have been successfully inserted.";
             } else {
-                message = rs + " No record Inserted.";
+                message = " No record Inserted.";
             }
         } catch (Exception ex) {
             status = "Error";
@@ -150,9 +150,9 @@ public class LeagueManager extends DbConnection {
             int rs = stm.executeUpdate();
 
             if (rs > 0) {
-                message = rs + " Record(s) have been successfully deleted.";
+                message =  " Record(s) have been successfully deleted.";
             } else {
-                message = rs + " No record Deleted.";
+                message =  " No record Deleted.";
             }
 
         } catch (SQLException ex) {
@@ -243,73 +243,7 @@ public class LeagueManager extends DbConnection {
         return jsonObject.toString();
     }
 
-    // Create Schedule
-    @GET
-    @Path("createSchedule&{teamA}&{teamB}&{date}&{venue}&{result}&{resultDescription}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String createSeason(
-            @PathParam("teamA") String teamA,
-            @PathParam("teamB") String teamB,
-            @PathParam("date") String date,
-            @PathParam("venue") String venue,
-            @PathParam("result") String result,
-            @PathParam("resultDescription") String resultDescription) {
-
-        PreparedStatement stm = null;
-        JSONObject jsonObj = null;
-        String sql;
-        String status = "OK";
-        String message = null;
-
-        try {
-
-            sql = "insert into Schedule (teamA,teamB,date,venue,result,resultDescription) values(?,?,?,?,?,?)";
-            stm = con().prepareStatement(sql);
-
-            // stm.setInt(1,scheduleId);
-            stm.setString(1, teamA);
-            stm.setString(2, teamB);
-            stm.setString(3, date);
-            stm.setString(4, venue);
-            stm.setString(5, result);
-            stm.setString(6, resultDescription);
-            //  stm.setInt(8,seasonId);
-
-            int rs = stm.executeUpdate();
-
-            if (rs > 0) {
-                message = rs + " Records have successfully been inserted.";
-                status = "ok";
-            }
-        } catch (SQLException ex) {
-            status = "Error";
-            message = ex.getMessage();
-
-        } finally {
-            jsonObj = new JSONObject();
-            jsonObj.accumulate("Status", status);
-            jsonObj.accumulate("TimeStamp", timeStamp);
-            jsonObj.accumulate("Message", message);
-
-            if (con() != null) {
-                try {
-                    con().close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                if (stm != null) {
-                    try {
-                        stm.close();
-                    } catch (SQLException ex) {
-                        Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
-
-                    }
-                }
-            }
-        }
-        return jsonObj.toString();
-    }
-
+    
      @GET
     @Path("createMatch&{matchNo}&{teamA}&{teamB}&{date}&{venue}&{result}&{resultDescription}&{seasonId}&{teamId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -349,8 +283,10 @@ public class LeagueManager extends DbConnection {
             int rs = stm.executeUpdate();
 
             if (rs > 0) {
-                message = rs + " Records have successfully been inserted.";
-                status = "ok";
+                message = " Records have successfully been inserted.";
+            }
+            else{
+                 message = " No records inserted.";
             }
         } catch (SQLException ex) {
             status = "Error";
