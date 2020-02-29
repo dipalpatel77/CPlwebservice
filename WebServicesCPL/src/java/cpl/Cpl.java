@@ -155,7 +155,7 @@ public class Cpl extends DbConnection {
             int rs = stm.executeUpdate();
 
             if (rs > 0) {
-                message = "Feedback Sent Succesfully";
+                message = "Feedback Sent Successfully";
             } else {
                 message = "Failed to Send Feedback";
                 status = "Error";
