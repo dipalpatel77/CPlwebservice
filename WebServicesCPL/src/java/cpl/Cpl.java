@@ -60,7 +60,7 @@ public class Cpl extends DbConnection {
             jsonObject.accumulate("Status", status);
             jsonObject.accumulate("TimeStamp", timeStamp);
             jsonObject.accumulate("Message", message);
-            jsonObject.accumulate("User Id", userId);
+            jsonObject.accumulate("UserId", userId);
             if (con() != null) {
                 try {
                     con().close();
@@ -114,7 +114,7 @@ public class Cpl extends DbConnection {
             jsonObject.accumulate("Status", status);
             jsonObject.accumulate("TimeStamp", timeStamp);
             jsonObject.accumulate("Message", message);
-            jsonObject.accumulate("User Id", userId);
+            jsonObject.accumulate("UserId", userId);
             if (con() != null) {
                 try {
                     con().close();
@@ -155,7 +155,7 @@ public class Cpl extends DbConnection {
             rs = stm.executeUpdate();
 
             if (rs > 0) {
-                message = rs + " Password updated successfully.";
+                message ="Password updated successfully";
 
             } else {
                 message = "No records updated.";
@@ -348,7 +348,6 @@ public class Cpl extends DbConnection {
         return jsonObject.toString();
     }
 
-    //chcek
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("viewSchedule&{scheduleId}")
