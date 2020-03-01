@@ -79,6 +79,61 @@ public class Cpl extends DbConnection {
         return jsonObject.toString();
     }
 
+     @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("verifyUser&{userEmail}&{dob}")
+    public String verifyUser(@PathParam("userEmail") String userEmail, @PathParam("dob") String dob) {
+
+        PreparedStatement stm = null;
+        String sql = null;
+        ResultSet rs;
+        int userId = -1;
+        String message = "Invalid User";
+        JSONObject jsonObject = null;
+        String status = "OK";
+
+        try {
+            
+          sql = "Select userId from User where email=? && dob=?";
+            
+            stm = con().prepareStatement(sql);
+            stm.setString(1, userEmail);
+            stm.setString(2, dob);
+            rs = stm.executeQuery();
+
+            while (rs.next()) {
+                userId = rs.getInt("userId");
+                message = "Valid User";
+            }
+
+        } catch (SQLException ex) {
+            status = "Error";
+            message = ex.getMessage();
+        } finally {
+            jsonObject = new JSONObject();
+            jsonObject.accumulate("Status", status);
+            jsonObject.accumulate("TimeStamp", timeStamp);
+            jsonObject.accumulate("Message", message);
+            jsonObject.accumulate("User Id", userId);
+            if (con() != null) {
+                try {
+                    con().close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (stm != null) {
+                    try {
+                        stm.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+        return jsonObject.toString();
+    }
+
+    
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("changePassword&{newPassword}&{userId}")
