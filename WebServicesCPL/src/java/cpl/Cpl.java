@@ -5,6 +5,7 @@
  */
 package cpl;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -79,7 +80,7 @@ public class Cpl extends DbConnection {
         return jsonObject.toString();
     }
 
-     @GET
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("verifyUser&{userEmail}&{dob}")
     public String verifyUser(@PathParam("userEmail") String userEmail, @PathParam("dob") String dob) {
@@ -93,9 +94,9 @@ public class Cpl extends DbConnection {
         String status = "OK";
 
         try {
-            
-          sql = "Select userId from User where email=? && dob=?";
-            
+
+            sql = "Select userId from User where email=? && dob=?";
+
             stm = con().prepareStatement(sql);
             stm.setString(1, userEmail);
             stm.setString(2, dob);
@@ -133,7 +134,6 @@ public class Cpl extends DbConnection {
         return jsonObject.toString();
     }
 
-    
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("changePassword&{newPassword}&{userId}")
@@ -155,10 +155,10 @@ public class Cpl extends DbConnection {
             rs = stm.executeUpdate();
 
             if (rs > 0) {
-                message ="Password updated successfully";
+                message = "Password Updated";
 
             } else {
-                message = "No records updated.";
+                message = "Failed";
             }
 
         } catch (Exception ex) {
@@ -210,9 +210,9 @@ public class Cpl extends DbConnection {
             int rs = stm.executeUpdate();
 
             if (rs > 0) {
-                message = "Feedback Sent Successfully";
+                message = "Feedback Sent";
             } else {
-                message = "Failed to Send Feedback";
+                message = "Failed";
                 status = "Error";
             }
         } catch (SQLException ex) {
@@ -223,6 +223,71 @@ public class Cpl extends DbConnection {
             jsonObject.accumulate("Status", status);
             jsonObject.accumulate("TimeStamp", timeStamp);
             jsonObject.accumulate("Message", message);
+
+            if (con() != null) {
+                try {
+                    con().close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (stm != null) {
+                    try {
+                        stm.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+        return jsonObject.toString();
+    }
+   
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("browsePlayers&{playerName}")
+    public String browsePlayers(@PathParam("playerName") String playerName) {
+
+        System.out.println("PlayerDetails");
+        PreparedStatement stm = null;
+        JSONObject jsonObject = null;
+        JSONArray list = null;
+        String sql = null;
+        String message = null;
+        String status = "OK";
+        JSONObject singleObject = null;
+
+        try {
+
+            sql = "Select * from Player where playerName LIKE ? ";
+            stm = con().prepareStatement(sql);
+            stm.setString(1, playerName + "%");
+            ResultSet rs = stm.executeQuery();
+
+            singleObject = new JSONObject();
+            list = new JSONArray();
+            while (rs.next()) {
+                message="Available";
+                singleObject.accumulate("playerId", rs.getInt("playerId"));
+                singleObject.accumulate("playerName", rs.getString("playerName"));
+                singleObject.accumulate("dob", rs.getString("dob"));
+                singleObject.accumulate("role", rs.getString("role"));
+                singleObject.accumulate("birthPlace", rs.getString("birthPlace"));
+                singleObject.accumulate("url", rs.getString("url"));
+                singleObject.accumulate("teamId", rs.getInt("teamId"));
+                list.add(singleObject);
+                singleObject.clear();
+                System.out.println(singleObject);
+            }
+        } catch (Exception e) {
+            status = "Error";
+            message = e.getMessage();
+        } finally {
+
+            jsonObject = new JSONObject();
+            jsonObject.accumulate("Status", status);
+            jsonObject.accumulate("TimeStamp", timeStamp);
+            jsonObject.accumulate("Message", message);
+            jsonObject.accumulate("Player Details", list);
 
             if (con() != null) {
                 try {
@@ -259,7 +324,7 @@ public class Cpl extends DbConnection {
             sql = "Select * from Player where playerId=?";
             stm = con().prepareStatement(sql);
             stm.setInt(1, playerId);
-            rs = stm.executeQuery(sql);
+            rs = stm.executeQuery();
 
             singleObject = new JSONObject();
             while (rs.next()) {
@@ -324,9 +389,9 @@ public class Cpl extends DbConnection {
             int rs = stmt.executeUpdate();
 
             if (rs > 0) {
-                msg = rs + " Record have successfully been updated.";
+                msg = rs + "Team updated";
             } else {
-                msg = rs + " No record updated.";
+                msg = rs + "Failed";
             }
 
         } catch (Exception ex) {
@@ -386,6 +451,7 @@ public class Cpl extends DbConnection {
             }
 
         } catch (Exception ex) {
+            status = "Error";
             Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
             message = ex.getMessage();
         } finally {
