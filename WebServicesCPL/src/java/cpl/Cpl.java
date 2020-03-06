@@ -605,4 +605,61 @@ public class Cpl extends DbConnection {
         }
         return jsonObject.toString();
     }  
+    @GET
+    @Path("viewSeason")
+    @Produces("application/json")
+    public String viewSeason() {
+        PreparedStatement stm = null;
+        String sql = null;
+        ResultSet rs;
+        JSONObject singleObject = null;
+        JSONObject jsonObject = null;
+        JSONArray jsonArray = null;
+        String status = "OK";
+        String message = null;
+
+        try {
+            sql = "Select * from Season";
+            stm = con().prepareStatement(sql);
+            rs = stm.executeQuery();
+
+            singleObject = new JSONObject();
+            jsonArray = new JSONArray();
+            while (rs.next()) {
+                message = "Available";
+                singleObject.accumulate("Season Title", rs.getString("seasonTitle"));
+                singleObject.accumulate("Description", rs.getString("description"));
+                singleObject.accumulate("Start Date", rs.getString("startDate"));
+                singleObject.accumulate("End Date", rs.getString("endDate"));
+                jsonArray.add(singleObject);
+                singleObject.clear();
+            }
+
+        } catch (SQLException ex) {
+            status = "Error";
+            message = ex.getMessage();
+        } finally {
+            jsonObject = new JSONObject();
+            jsonObject.accumulate("Status", status);
+            jsonObject.accumulate("TimeStamp", timeStamp);
+            jsonObject.accumulate("Message", message);
+            jsonObject.accumulate("String", jsonArray);
+
+            if (con() != null) {
+                try {
+                    con().close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (stm != null) {
+                    try {
+                        stm.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+        return jsonObject.toString();
+    }
 }
