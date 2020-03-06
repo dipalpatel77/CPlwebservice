@@ -247,7 +247,7 @@ public class Cpl extends DbConnection {
     @Path("browsePlayers&{playerName}")
     public String browsePlayers(@PathParam("playerName") String playerName) {
 
-        System.out.println("PlayerDetails");
+        System.out.println("browsePlayers");
         PreparedStatement stm = null;
         JSONObject jsonObject = null;
         JSONArray list = null;
@@ -538,105 +538,56 @@ public class Cpl extends DbConnection {
         }
         return jsonObject.toString();
     }
-
+    
     @GET
-    @Path("viewPlayersByTeam&{teamId}")
+    @Path("viewMatch&{seasonId}")
     @Produces("application/json")
-    public String viewPlayersByTeam(@PathParam("teamId") int teamId) {
-
+    public String viewMatch(@PathParam("seasonId") int seasonId) {
         PreparedStatement stm = null;
         String sql = null;
         ResultSet rs;
+        String result = null;
+        JSONObject singleObject=null;
         JSONObject jsonObject = null;
-        JSONObject singleObject = null;
-        JSONArray list = null;
+         JSONArray jsonArray=null;
         String status = "OK";
         String message = null;
-
+        
         try {
-            sql = "Select * from Player where teamId=?";
+            
+            sql = "select * from Matches where seasonId=? order by date asc;";
             stm = con().prepareStatement(sql);
-            stm.setInt(1, teamId);
-            rs = stm.executeQuery();
-            singleObject = new JSONObject();
-            list = new JSONArray();
-
-            while (rs.next()) {
-                message = "Available";
-                singleObject.accumulate("playerId", rs.getString("playerId"));
-                singleObject.accumulate("name", rs.getString("playerName"));
-                list.add(singleObject);
-                singleObject.clear();
-            }
-
-        } catch (SQLException ex) {
-            status = "Error";
-            message = ex.getMessage();
-        } finally {
-            jsonObject = new JSONObject();
-            jsonObject.accumulate("Status", status);
-            jsonObject.accumulate("TimeStamp", timeStamp);
-            jsonObject.accumulate("Message", message);
-            jsonObject.accumulate("Players", list);
-            if (con() != null) {
-                try {
-                    con().close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                if (stm != null) {
-                    try {
-                        stm.close();
-                    } catch (SQLException ex) {
-                        Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-        }
-
-        return jsonObject.toString();
-    }
-
-    @GET
-    @Path("viewSeason")
-    @Produces("application/json")
-    public String viewSeason() {
-        PreparedStatement stm = null;
-        String sql = null;
-        ResultSet rs;
-        JSONObject singleObject = null;
-        JSONObject jsonObject = null;
-        JSONArray jsonArray = null;
-        String status = "OK";
-        String message = null;
-
-        try {
-            sql = "Select * from Season";
-            stm = con().prepareStatement(sql);
+            stm.setInt(1, seasonId);
             rs = stm.executeQuery();
 
-            singleObject = new JSONObject();
-            jsonArray = new JSONArray();
+            singleObject=new JSONObject();
+            jsonArray=new JSONArray();
+            
             while (rs.next()) {
-                message = "Available";
-                singleObject.accumulate("Season Title", rs.getString("seasonTitle"));
-                singleObject.accumulate("Description", rs.getString("description"));
-                singleObject.accumulate("Start Date", rs.getString("startDate"));
-                singleObject.accumulate("End Date", rs.getString("endDate"));
+            
+               singleObject.accumulate("Match Number", rs.getInt("matchNo"));
+               singleObject.accumulate("TeamA", rs.getString("teamA"));
+               singleObject.accumulate("TeamB", rs.getString("TeamB"));
+               singleObject.accumulate("Date", rs.getString("date"));
+               singleObject.accumulate("Venue", rs.getString("venue"));
+               singleObject.accumulate("Result", rs.getString("result"));
+               singleObject.accumulate("Result Description", rs.getString("resultDescription"));
+               singleObject.accumulate("seasonId", rs.getInt("seasonId"));
+               singleObject.accumulate("teamId", rs.getInt("teamId"));
+               
                 jsonArray.add(singleObject);
                 singleObject.clear();
             }
-
         } catch (SQLException ex) {
             status = "Error";
-            message = ex.getMessage();
+            result = ex.getMessage();
         } finally {
             jsonObject = new JSONObject();
             jsonObject.accumulate("Status", status);
             jsonObject.accumulate("TimeStamp", timeStamp);
-            jsonObject.accumulate("Message", message);
-            jsonObject.accumulate("String", jsonArray);
-
+            jsonObject.accumulate("Message", result);
+            jsonObject.accumulate("String", jsonArray);  
+           
             if (con() != null) {
                 try {
                     con().close();
@@ -653,5 +604,5 @@ public class Cpl extends DbConnection {
             }
         }
         return jsonObject.toString();
-    }
+    }  
 }
