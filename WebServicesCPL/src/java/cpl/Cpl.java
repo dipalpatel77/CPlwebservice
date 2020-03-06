@@ -627,6 +627,7 @@ public class Cpl extends DbConnection {
             jsonArray = new JSONArray();
             while (rs.next()) {
                 message = "Available";
+                singleObject.accumulate("SeasonId",rs.getInt("seasonId"));
                 singleObject.accumulate("Season Title", rs.getString("seasonTitle"));
                 singleObject.accumulate("Description", rs.getString("description"));
                 singleObject.accumulate("Start Date", rs.getString("startDate"));
