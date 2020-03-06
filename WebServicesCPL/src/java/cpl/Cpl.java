@@ -662,4 +662,61 @@ public class Cpl extends DbConnection {
         }
         return jsonObject.toString();
     }
+    @GET
+    @Path("viewPlayersByTeam&{teamId}")
+    @Produces("application/json")
+    public String viewPlayersByTeam(@PathParam("teamId") int teamId) {
+
+        PreparedStatement stm = null;
+        String sql = null;
+        ResultSet rs;
+        JSONObject jsonObject = null;
+        JSONObject singleObject = null;
+        JSONArray list = null;
+        String status = "OK";
+        String message = null;
+
+        try {
+            sql = "Select * from Player where teamId=?";
+            stm = con().prepareStatement(sql);
+            stm.setInt(1, teamId);
+            rs = stm.executeQuery();
+            singleObject = new JSONObject();
+            list = new JSONArray();
+
+            while (rs.next()) {
+                message = "Available";
+                singleObject.accumulate("playerId", rs.getString("playerId"));
+                singleObject.accumulate("name", rs.getString("playerName"));
+                list.add(singleObject);
+                singleObject.clear();
+            }
+
+        } catch (SQLException ex) {
+            status = "Error";
+            message = ex.getMessage();
+        } finally {
+            jsonObject = new JSONObject();
+            jsonObject.accumulate("Status", status);
+            jsonObject.accumulate("TimeStamp", timeStamp);
+            jsonObject.accumulate("Message", message);
+            jsonObject.accumulate("Players", list);
+            if (con() != null) {
+                try {
+                    con().close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (stm != null) {
+                    try {
+                        stm.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+
+        return jsonObject.toString();
+    }
 }
