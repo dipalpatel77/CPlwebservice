@@ -688,7 +688,12 @@ public class Cpl extends DbConnection {
             while (rs.next()) {
                 message = "Available";
                 singleObject.accumulate("playerId", rs.getString("playerId"));
-                singleObject.accumulate("name", rs.getString("playerName"));
+                singleObject.accumulate("playerName", rs.getString("playerName"));
+                singleObject.accumulate("dob", rs.getString("dob"));
+                singleObject.accumulate("birthPlace", rs.getString("birthPlace"));
+                singleObject.accumulate("url", rs.getString("url"));
+                singleObject.accumulate("teamId", rs.getString("teamId"));
+                 
                 list.add(singleObject);
                 singleObject.clear();
             }
