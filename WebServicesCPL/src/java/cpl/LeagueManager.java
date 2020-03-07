@@ -378,7 +378,7 @@ public class LeagueManager extends DbConnection {
     @GET
     @Path("InsertIntopointTable&{TeamName}&{TeamName2}&{play}&{Win}&{Lose}&{Points}&{seasonId}&{matchId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String createMatch(
+    public String InsertIntoPointTable(
             @PathParam("TeamName") String team1,
             @PathParam("TeamName2") String team2,
             @PathParam("play") int play,
@@ -457,7 +457,7 @@ public class LeagueManager extends DbConnection {
        @GET
     @Path("updatePointTable&{TeamName}&{seasonId}&{matchId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String createMatch(
+    public String updatePointTable(
             @PathParam("TeamName") String team1,
             @PathParam("seasonId") int seasonId,
             @PathParam("matchId") int matchId)
