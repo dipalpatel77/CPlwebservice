@@ -754,7 +754,7 @@ public class Cpl extends DbConnection {
                 singleObject.accumulate("UserName", rs.getString("UserName"));
                 singleObject.accumulate("teamManagerId", rs.getString("teamManagerId"));
                 jsonarray.add(singleObject);
-                
+                singleObject.clear();
                 }
 
         } catch (Exception ex) {

@@ -5,6 +5,8 @@
  */
 package cpl;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -395,7 +397,7 @@ public class LeagueManager extends DbConnection {
 
         try {
 
-            sql = "insert into PoinTable (TeamName,play,Win,Lose,Points,seasonId,matchId) values(?,?,?,?,?,?,?),(?,?,?,?,?,?,?)";
+            sql = "insert into PointTable (TeamName,play,Win,Lose,Points,seasonId,matchId) values(?,?,?,?,?,?,?),(?,?,?,?,?,?,?)";
             stm = con().prepareStatement(sql);
 
            
@@ -451,5 +453,74 @@ public class LeagueManager extends DbConnection {
         }
         return jsonObj.toString();
     }
+//playerList
+    @GET
+    @Path("playerList")
+    @Produces("application/json")
+    public String playerList() {
+        Connection con = null;
+        PreparedStatement stm = null;
+        String sql = null;
+        ResultSet rs;
+        String result = null;
+        JSONObject singleObject=new JSONObject();
+        JSONObject jsonObject = new JSONObject();
+         JSONArray jsonarry=new JSONArray();
+        String status = "OK";
+        String message = null;
+       
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            //DriverManager.registerDriver(new mysql.jdbc.OracleDriver());
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
 
+            sql = "select * from Player where teamId IS NULL;";
+            stm = con.prepareStatement(sql);
+            rs = stm.executeQuery();
+
+            while (rs.next()) {
+              //  System.out.println(rs.toString());
+               singleObject.accumulate("playerId", rs.getInt("playerId"));
+               singleObject.accumulate("playerName", rs.getString("playerName"));
+               singleObject.accumulate("dob", rs.getString("dob"));
+               singleObject.accumulate("role", rs.getString("role"));
+               singleObject.accumulate("birthPlace", rs.getString("birthPlace"));
+               singleObject.accumulate("url", rs.getString("url"));
+               singleObject.accumulate("teamId", rs.getString("teamId"));
+               
+                jsonarry.add(singleObject);
+                singleObject.clear();
+
+            }
+
+        } catch (SQLException ex) {
+            status = "Error";
+            result = ex.getMessage();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            jsonObject = new JSONObject();
+            jsonObject.accumulate("Status", status);
+            jsonObject.accumulate("TimeStamp", timeStamp);
+            jsonObject.accumulate("Message", result);
+            jsonObject.accumulate("String", jsonarry);  
+           
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (stm != null) {
+                    try {
+                        stm.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+
+        return jsonObject.toString();
+    }
 }
