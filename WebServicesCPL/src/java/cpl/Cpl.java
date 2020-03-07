@@ -844,5 +844,79 @@ public class Cpl extends DbConnection {
 
         return jsonObject.toString();
     }
+    
+     @GET
+    @Path("updatePlayerTeams&{teamId}&{player1}&{player2}&{player3}&{player4}&{player5}&{player6}&{player7}&{player8}&{player9}&{player10}&{player11}&{player12}&{player13}&{player14}&{player15}")
+    @Produces("application/json")
+    public String updatePlayerTeams(@PathParam("teamId") int teamId, @PathParam("player1") int player1, @PathParam("player2") int player2,
+            @PathParam("player3") int player3, @PathParam("player4") int player4, @PathParam("player5") int player5, @PathParam("player6") int player6,
+            @PathParam("player7") int player7, @PathParam("player8") int player8, @PathParam("player9") int player9, @PathParam("player10") int player10,
+            @PathParam("player11") int player11, @PathParam("player12") int player12, @PathParam("player13") int player13, @PathParam("player14") int player14,
+            @PathParam("player15") int player15) {
+       
+        JSONObject jsonObject;
+        PreparedStatement stmt = null;
+        String status = "OK";
+        String message = null;
+        String sql;
 
+        try {
+          
+            sql = "UPDATE Player set teamId=? where playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=?";
+            stmt = con().prepareStatement(sql);
+
+            stmt.setInt(1, teamId);
+            stmt.setInt(2, player1);
+            stmt.setInt(3, player2);
+            stmt.setInt(4, player3);
+            stmt.setInt(5, player4);
+            stmt.setInt(6, player5);
+            stmt.setInt(7, player6);
+            stmt.setInt(8, player7);
+            stmt.setInt(9, player8);
+            stmt.setInt(10, player9);
+            stmt.setInt(11, player10);
+            stmt.setInt(12, player11);
+            stmt.setInt(13, player12);
+            stmt.setInt(14, player13);
+            stmt.setInt(15, player14);
+            stmt.setInt(16, player15);
+
+            int rs = stmt.executeUpdate();
+           
+            if (rs > 0) {
+                message = "Players Added";
+
+            } else {
+                message = "Error while adding Players";
+            }
+
+        } catch (Exception ex) {
+            status = "Error";
+            message = ex.getMessage();
+
+        } finally {
+
+            jsonObject = new JSONObject();
+            jsonObject.accumulate("Status", status);
+            jsonObject.accumulate("TimeStamp", timeStamp);
+            jsonObject.accumulate("Message", message);
+
+            if (con() != null) {
+                try {
+                    con().close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (stmt != null) {
+                    try {
+                        stmt.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+        return jsonObject.toString();
+    }
 }
