@@ -373,4 +373,83 @@ public class LeagueManager extends DbConnection {
         }
         return jsonObject.toString();
     }
+    @GET
+    @Path("InsertIntopointTable&{TeamName}&{TeamName2}&{play}&{Win}&{Lose}&{Points}&{seasonId}&{matchId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String createMatch(
+            @PathParam("TeamName") String team1,
+            @PathParam("TeamName2") String team2,
+            @PathParam("play") int play,
+            @PathParam("Win") int win,
+            @PathParam("Lose") int lose,
+            @PathParam("Points") int point,
+            @PathParam("seasonId") int seasonId,
+            @PathParam("matchId") int matchId)
+          {
+
+        PreparedStatement stm = null;
+        JSONObject jsonObj = null;
+        String sql;
+        String status = "OK";
+        String message = null;
+
+        try {
+
+            sql = "insert into PoinTable (TeamName,play,Win,Lose,Points,seasonId,matchId) values(?,?,?,?,?,?,?),(?,?,?,?,?,?,?)";
+            stm = con().prepareStatement(sql);
+
+           
+            stm.setString(1, team1);
+            stm.setInt(2, 0);
+            stm.setInt(3, 0);
+            stm.setInt(4, 0);
+            stm.setInt(5, 0);
+            stm.setInt(6,seasonId);
+            stm.setInt(7,matchId);
+	    
+            stm.setString(8, team2);
+            stm.setInt(9, 0);
+            stm.setInt(10, 0);
+            stm.setInt(11, 0);
+            stm.setInt(12, 0);
+            stm.setInt(13,seasonId);
+            stm.setInt(14,matchId);
+
+            int rs = stm.executeUpdate();
+
+            if (rs > 0) {
+                message = " Records have successfully been inserted.";
+               }
+            else{
+                 message = " No records inserted.";
+            }
+        } catch (SQLException ex) {
+            status = "Error";
+            message = ex.getMessage();
+
+         } finally {
+            jsonObj = new JSONObject();
+            jsonObj.accumulate("Status", status);
+            jsonObj.accumulate("TimeStamp", timeStamp);
+            jsonObj.accumulate("Message", message);
+
+            if (con() != null) {
+                try {
+                    con().close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (stm != null) {
+                    try {
+                        stm.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
+
+                    }
+                }
+            }
+        }
+        return jsonObj.toString();
+    }
+
 }
