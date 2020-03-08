@@ -595,7 +595,7 @@ public class LeagueManager extends DbConnection {
      @GET
     @Path("updateMatches&{matchId}&{result}&{resultDescription}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String createMatch(
+    public String updateMatches(
             @PathParam("matchId") int matchId,
             @PathParam("result") String result,
 	    @PathParam("resultDescription") String resultDescription)
@@ -609,8 +609,7 @@ public class LeagueManager extends DbConnection {
 
         try {
 
-            sql = "insert into Matches (matchNo,teamA,teamB,date,venue,result,resultDescription,seasonId,teamId) values(?,?,?,?,?,?,?,?,?)";
-			sql = "update Matches set  result = ? ,resultDescription = ?   where matchId  = ? ";
+           sql = "update Matches set  result = ? ,resultDescription = ?   where matchId  = ? ";
             stm = con().prepareStatement(sql);
 
             stm.setString(1,result);
