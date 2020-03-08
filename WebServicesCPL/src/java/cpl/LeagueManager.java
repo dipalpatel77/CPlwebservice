@@ -376,9 +376,9 @@ public class LeagueManager extends DbConnection {
         return jsonObject.toString();
     }
     @GET
-    @Path("InsertIntopointTable&{TeamName}&{TeamName2}&{play}&{Win}&{Lose}&{Points}&{seasonId}&{matchId}")
+    @Path("insertIntoPointTable&{TeamName}&{TeamName2}&{play}&{Win}&{Lose}&{Points}&{seasonId}&{matchId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String InsertIntoPointTable(
+    public String insertIntoPointTable(
             @PathParam("TeamName") String team1,
             @PathParam("TeamName2") String team2,
             @PathParam("play") int play,
@@ -420,10 +420,10 @@ public class LeagueManager extends DbConnection {
             int rs = stm.executeUpdate();
 
             if (rs > 0) {
-                message = " Records have successfully been inserted.";
+                message = "Points Inserted";
                }
             else{
-                 message = " No records inserted.";
+                 message = "Error";
             }
         } catch (SQLException ex) {
             status = "Error";
@@ -471,27 +471,29 @@ public class LeagueManager extends DbConnection {
 
         try {
 
-            sql = "update PointTable set  Win = Win + 1 ,Points = Points + 2  where TeamName  = ? and matchId = ? ";
-	    sql1 = "update PointTable set  Win = Win + 1 , Lose = Lose + 1  where TeamName  != ? and matchId = ?";	
+            sql = "update PointTable set  Win = Win + 1 ,Points = Points + 2  where TeamName  = ? and matchId = ? and seasonId=?";
+	    sql1 = "update PointTable set  Win = Win + 1 , Lose = Lose + 1  where TeamName  != ? and matchId = ? and seasonId=?";	
 	
             stm = con().prepareStatement(sql);
 	    stm1 = con().prepareStatement(sql1);
            
             stm.setString(1, team1);
             stm.setInt(2, matchId);
+            stm.setInt(3, seasonId);
             
 	    
             stm1.setString(1, team1);
             stm1.setInt(2, matchId);
+            stm1.setInt(3, seasonId);
             
             int rs = stm.executeUpdate();
 	    int rs1 = stm1.executeUpdate();
 
             if (rs > 0 && rs1 > 0) {
-                message = " Records have successfully been inserted.";
+                message = "Point Table Updated";
             }
             else{
-                 message = " No records inserted.";
+                 message = "Error";
             }
         } catch (SQLException ex) {
             status = "Error";
@@ -522,7 +524,6 @@ public class LeagueManager extends DbConnection {
         return jsonObj.toString();
     }
 
-//playerList
     @GET
     @Path("playerList")
     @Produces("application/json")
@@ -532,23 +533,21 @@ public class LeagueManager extends DbConnection {
         String sql = null;
         ResultSet rs;
         String result = null;
-        JSONObject singleObject=new JSONObject();
-        JSONObject jsonObject = new JSONObject();
-         JSONArray jsonarry=new JSONArray();
+        JSONObject singleObject=null;
+        JSONObject jsonObject = null;
+         JSONArray jsonArray=null;
         String status = "OK";
         String message = null;
        
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            //DriverManager.registerDriver(new mysql.jdbc.OracleDriver());
-            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
-
             sql = "select * from Player where teamId IS NULL;";
-            stm = con.prepareStatement(sql);
+            stm = con().prepareStatement(sql);
             rs = stm.executeQuery();
 
+            singleObject=new JSONObject();
+            jsonArray=new JSONArray();
             while (rs.next()) {
-              //  System.out.println(rs.toString());
+                message="Available";
                singleObject.accumulate("playerId", rs.getInt("playerId"));
                singleObject.accumulate("playerName", rs.getString("playerName"));
                singleObject.accumulate("dob", rs.getString("dob"));
@@ -557,22 +556,19 @@ public class LeagueManager extends DbConnection {
                singleObject.accumulate("url", rs.getString("url"));
                singleObject.accumulate("teamId", rs.getString("teamId"));
                
-                jsonarry.add(singleObject);
+                jsonArray.add(singleObject);
                 singleObject.clear();
-
             }
 
         } catch (SQLException ex) {
             status = "Error";
             result = ex.getMessage();
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             jsonObject = new JSONObject();
             jsonObject.accumulate("Status", status);
             jsonObject.accumulate("TimeStamp", timeStamp);
             jsonObject.accumulate("Message", result);
-            jsonObject.accumulate("String", jsonarry);  
+            jsonObject.accumulate("Players", jsonArray);  
            
             if (con != null) {
                 try {
@@ -618,10 +614,10 @@ public class LeagueManager extends DbConnection {
             int rs = stm.executeUpdate();
 
             if (rs > 0) {
-                message = " Records have successfully been inserted.";
+                message = " Result Entered";
             }
             else{
-                 message = " No records inserted.";
+                 message = "Error";
             }
         } catch (SQLException ex) {
             status = "Error";

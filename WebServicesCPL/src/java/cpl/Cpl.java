@@ -415,73 +415,6 @@ public class Cpl extends DbConnection {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("viewSchedule&{scheduleId}")
-    public String viewSchedule(@PathParam("scheduleId") int scheduleId) {
-
-        PreparedStatement stm = null;
-        String sql = null;
-        ResultSet rs;
-        JSONObject jsonObject = null;
-        String status = "OK";
-        String message = null;
-        JSONObject mainObject = null;
-        JSONArray list = null;
-
-        try {
-            sql = "Select * from Schedule where scheduleId=?";
-            stm = con().prepareStatement(sql);
-            stm.setInt(1, scheduleId);
-            rs = stm.executeQuery();
-
-            mainObject = new JSONObject();
-            list = new JSONArray();
-            while (rs.next()) {
-                message = "Available";
-                mainObject.accumulate("scheduleId", rs.getInt("scheduleId"));
-                mainObject.accumulate("teamA", rs.getString("teamA"));
-                mainObject.accumulate("teamB", rs.getString("teamB"));
-                mainObject.accumulate("Date", rs.getString("Date"));
-                mainObject.accumulate("venue", rs.getString("venue"));
-                //Cannot determine value type from string 'null'
-//                mainObject.accumulate("result", rs.getString("result"));
-//                mainObject.accumulate("resultDescription", rs.getInt("resultDescription"));
-                System.out.println(mainObject);
-                list.add(mainObject);
-                mainObject.clear();
-            }
-
-        } catch (Exception ex) {
-            status = "Error";
-            Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
-            message = ex.getMessage();
-        } finally {
-            jsonObject = new JSONObject();
-            jsonObject.accumulate("Status", status);
-            jsonObject.accumulate("TimeStamp", timeStamp);
-            jsonObject.accumulate("Message", message);
-            jsonObject.accumulate("Schedule", list);
-
-            if (con() != null) {
-                try {
-                    con().close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                if (stm != null) {
-                    try {
-                        stm.close();
-                    } catch (SQLException ex) {
-                        Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-        }
-
-        return jsonObject.toString();
-    }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("viewTeams")
     public String viewTeams() {
 
@@ -564,7 +497,8 @@ public class Cpl extends DbConnection {
             jsonArray=new JSONArray();
             
             while (rs.next()) {
-            
+                
+            singleObject.accumulate("Match Id", rs.getInt("matchId"));
                singleObject.accumulate("Match Number", rs.getInt("matchNo"));
                singleObject.accumulate("TeamA", rs.getString("teamA"));
                singleObject.accumulate("TeamB", rs.getString("TeamB"));
@@ -785,9 +719,9 @@ public class Cpl extends DbConnection {
         return jsonObject.toString();
     }
 @GET
-    @Path("ShowTable&{seasonId}")
+    @Path("viewTable&{seasonId}")
     @Produces("application/json")
-    public String ShowTable(@PathParam("seasonId") int seasonId) {
+    public String viewTable(@PathParam("seasonId") int seasonId) {
 
         PreparedStatement stm = null;
         String sql = null;
@@ -799,7 +733,7 @@ public class Cpl extends DbConnection {
         String message = null;
 
         try {
-            sql = "SELECT  TeamName,sum(play)AS play ,sum(Win) as Win ,sum(Lose) as Lose,sum(Points) as Points FROM PointTable where seasonId = ? Group by TeamName ;";
+            sql = "SELECT  TeamName,sum(play) AS Play ,sum(Win) as Win ,sum(Lose) as Lose,sum(Points) as Points FROM PointTable where seasonId = ? Group by TeamName ;";
             stm = con().prepareStatement(sql);
             stm.setInt(1, seasonId);
             rs = stm.executeQuery();
@@ -812,7 +746,7 @@ public class Cpl extends DbConnection {
                 singleObject.accumulate("play", rs.getInt("play"));
                 singleObject.accumulate("Win", rs.getInt("Win"));
                 singleObject.accumulate("Lose", rs.getInt("Lose"));
-                singleObject.accumulate("Points", rs.getString("Points"));           
+                singleObject.accumulate("Points", rs.getInt("Points"));           
                 list.add(singleObject);
                 singleObject.clear();
             }
