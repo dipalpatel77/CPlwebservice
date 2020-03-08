@@ -555,7 +555,7 @@ public class Cpl extends DbConnection {
         
         try {
             
-            sql = "select * from Matches where seasonId=? order by date asc;";
+            sql = "select * from Matches where seasonId=? order by date asc";
             stm = con().prepareStatement(sql);
             stm.setInt(1, seasonId);
             rs = stm.executeQuery();
@@ -619,7 +619,7 @@ public class Cpl extends DbConnection {
         String message = null;
 
         try {
-            sql = "Select * from Season";
+            sql = "Select * from Season order by date asc";
             stm = con().prepareStatement(sql);
             rs = stm.executeQuery();
 
