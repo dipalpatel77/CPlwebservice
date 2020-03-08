@@ -585,11 +585,72 @@ public class LeagueManager extends DbConnection {
                         stm.close();
                     } catch (SQLException ex) {
                         Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    }   
                 }
             }
         }
 
         return jsonObject.toString();
     }
+     @GET
+    @Path("updateMatches&{matchId}&{result}&{resultDescription}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String createMatch(
+            @PathParam("matchId") int matchId,
+            @PathParam("result") String result,
+	    @PathParam("resultDescription") String resultDescription)
+          {
+
+        PreparedStatement stm = null;
+        JSONObject jsonObj = null;
+        String sql;
+        String status = "OK";
+        String message = null;
+
+        try {
+
+            sql = "insert into Matches (matchNo,teamA,teamB,date,venue,result,resultDescription,seasonId,teamId) values(?,?,?,?,?,?,?,?,?)";
+			sql = "update Matches set  result = ? ,resultDescription = ?   where matchId  = ? ";
+            stm = con().prepareStatement(sql);
+
+            stm.setString(1,result);
+            stm.setString(2, resultDescription);
+            stm.setInt(3, matchId);
+            int rs = stm.executeUpdate();
+
+            if (rs > 0) {
+                message = " Records have successfully been inserted.";
+            }
+            else{
+                 message = " No records inserted.";
+            }
+        } catch (SQLException ex) {
+            status = "Error";
+            message = ex.getMessage();
+
+         } finally {
+            jsonObj = new JSONObject();
+            jsonObj.accumulate("Status", status);
+            jsonObj.accumulate("TimeStamp", timeStamp);
+            jsonObj.accumulate("Message", message);
+
+            if (con() != null) {
+                try {
+                    con().close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (stm != null) {
+                    try {
+                        stm.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
+
+                    }
+                }
+            }
+        }
+        return jsonObj.toString();
+    }
+
 }
