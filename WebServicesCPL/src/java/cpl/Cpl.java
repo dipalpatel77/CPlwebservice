@@ -619,7 +619,7 @@ public class Cpl extends DbConnection {
         String message = null;
 
         try {
-            sql = "Select * from Season order by date asc";
+            sql = "Select * from Season order by startDate desc";
             stm = con().prepareStatement(sql);
             rs = stm.executeQuery();
 

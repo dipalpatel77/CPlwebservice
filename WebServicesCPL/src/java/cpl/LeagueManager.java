@@ -285,10 +285,10 @@ public class LeagueManager extends DbConnection {
             int rs = stm.executeUpdate();
 
             if (rs > 0) {
-                message = " Records have successfully been inserted.";
+                message = "Match Created";
             }
             else{
-                 message = " No records inserted.";
+                 message = "Error";
             }
         } catch (SQLException ex) {
             status = "Error";
