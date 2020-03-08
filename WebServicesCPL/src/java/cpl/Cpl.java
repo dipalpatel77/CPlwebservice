@@ -733,7 +733,7 @@ public class Cpl extends DbConnection {
         String message = null;
 
         try {
-            sql = "SELECT  TeamName,sum(play) AS Play ,sum(Win) as Win ,sum(Lose) as Lose,sum(Points) as Points FROM PointTable where seasonId = ? Group by TeamName ;";
+           sql = "SELECT  TeamName,sum(play)AS play ,sum(Win) as Win ,sum(Lose) as Lose,sum(Points) as Points FROM PointTable where seasonId = ? Group by TeamName order by points desc;";
             stm = con().prepareStatement(sql);
             stm.setInt(1, seasonId);
             rs = stm.executeQuery();
