@@ -241,13 +241,11 @@ public class Cpl extends DbConnection {
         }
         return jsonObject.toString();
     }
-   
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("browsePlayers&{playerName}")
     public String browsePlayers(@PathParam("playerName") String playerName) {
-
-        System.out.println("browsePlayers");
         PreparedStatement stm = null;
         JSONObject jsonObject = null;
         JSONArray list = null;
@@ -266,7 +264,7 @@ public class Cpl extends DbConnection {
             singleObject = new JSONObject();
             list = new JSONArray();
             while (rs.next()) {
-                message="Available";
+                message = "Available";
                 singleObject.accumulate("playerId", rs.getInt("playerId"));
                 singleObject.accumulate("playerName", rs.getString("playerName"));
                 singleObject.accumulate("dob", rs.getString("dob"));
@@ -276,7 +274,6 @@ public class Cpl extends DbConnection {
                 singleObject.accumulate("teamId", rs.getInt("teamId"));
                 list.add(singleObject);
                 singleObject.clear();
-                System.out.println(singleObject);
             }
         } catch (Exception e) {
             status = "Error";
@@ -395,7 +392,7 @@ public class Cpl extends DbConnection {
             }
 
         } catch (Exception ex) {
-            status = "error";
+            status = "Error";
             msg = ex.getMessage();
         } finally {
             jsonObject = new JSONObject();
@@ -471,7 +468,7 @@ public class Cpl extends DbConnection {
         }
         return jsonObject.toString();
     }
-    
+
     @GET
     @Path("viewMatch&{seasonId}")
     @Produces("application/json")
@@ -480,35 +477,35 @@ public class Cpl extends DbConnection {
         String sql = null;
         ResultSet rs;
         String result = null;
-        JSONObject singleObject=null;
+        JSONObject singleObject = null;
         JSONObject jsonObject = null;
-         JSONArray jsonArray=null;
+        JSONArray jsonArray = null;
         String status = "OK";
         String message = null;
-        
+
         try {
-            
+
             sql = "select * from Matches where seasonId=? order by date asc";
             stm = con().prepareStatement(sql);
             stm.setInt(1, seasonId);
             rs = stm.executeQuery();
 
-            singleObject=new JSONObject();
-            jsonArray=new JSONArray();
-            
+            singleObject = new JSONObject();
+            jsonArray = new JSONArray();
+
             while (rs.next()) {
-                
-            singleObject.accumulate("Match Id", rs.getInt("matchId"));
-               singleObject.accumulate("Match Number", rs.getInt("matchNo"));
-               singleObject.accumulate("TeamA", rs.getString("teamA"));
-               singleObject.accumulate("TeamB", rs.getString("TeamB"));
-               singleObject.accumulate("Date", rs.getString("date"));
-               singleObject.accumulate("Venue", rs.getString("venue"));
-               singleObject.accumulate("Result", rs.getString("result"));
-               singleObject.accumulate("Result Description", rs.getString("resultDescription"));
-               singleObject.accumulate("seasonId", rs.getInt("seasonId"));
-               singleObject.accumulate("teamId", rs.getInt("teamId"));
-               
+                message = "Available";
+                singleObject.accumulate("Match Id", rs.getInt("matchId"));
+                singleObject.accumulate("Match Number", rs.getInt("matchNo"));
+                singleObject.accumulate("TeamA", rs.getString("teamA"));
+                singleObject.accumulate("TeamB", rs.getString("TeamB"));
+                singleObject.accumulate("Date", rs.getString("date"));
+                singleObject.accumulate("Venue", rs.getString("venue"));
+                singleObject.accumulate("Result", rs.getString("result"));
+                singleObject.accumulate("Result Description", rs.getString("resultDescription"));
+                singleObject.accumulate("seasonId", rs.getInt("seasonId"));
+                singleObject.accumulate("teamId", rs.getInt("teamId"));
+
                 jsonArray.add(singleObject);
                 singleObject.clear();
             }
@@ -520,8 +517,8 @@ public class Cpl extends DbConnection {
             jsonObject.accumulate("Status", status);
             jsonObject.accumulate("TimeStamp", timeStamp);
             jsonObject.accumulate("Message", result);
-            jsonObject.accumulate("String", jsonArray);  
-           
+            jsonObject.accumulate("Matches", jsonArray);
+
             if (con() != null) {
                 try {
                     con().close();
@@ -538,7 +535,8 @@ public class Cpl extends DbConnection {
             }
         }
         return jsonObject.toString();
-    }  
+    }
+
     @GET
     @Path("viewSeason")
     @Produces("application/json")
@@ -561,7 +559,7 @@ public class Cpl extends DbConnection {
             jsonArray = new JSONArray();
             while (rs.next()) {
                 message = "Available";
-                singleObject.accumulate("SeasonId",rs.getInt("seasonId"));
+                singleObject.accumulate("SeasonId", rs.getInt("seasonId"));
                 singleObject.accumulate("Season Title", rs.getString("seasonTitle"));
                 singleObject.accumulate("Description", rs.getString("description"));
                 singleObject.accumulate("Start Date", rs.getString("startDate"));
@@ -578,7 +576,7 @@ public class Cpl extends DbConnection {
             jsonObject.accumulate("Status", status);
             jsonObject.accumulate("TimeStamp", timeStamp);
             jsonObject.accumulate("Message", message);
-            jsonObject.accumulate("String", jsonArray);
+            jsonObject.accumulate("Seasons", jsonArray);
 
             if (con() != null) {
                 try {
@@ -597,6 +595,7 @@ public class Cpl extends DbConnection {
         }
         return jsonObject.toString();
     }
+
     @GET
     @Path("viewPlayersByTeam&{teamId}")
     @Produces("application/json")
@@ -628,7 +627,7 @@ public class Cpl extends DbConnection {
                 singleObject.accumulate("birthPlace", rs.getString("birthPlace"));
                 singleObject.accumulate("url", rs.getString("url"));
                 singleObject.accumulate("teamId", rs.getString("teamId"));
-                 
+
                 list.add(singleObject);
                 singleObject.clear();
             }
@@ -660,8 +659,7 @@ public class Cpl extends DbConnection {
 
         return jsonObject.toString();
     }
-    
-    //VIEW teammanager name and ids
+
     @GET
     @Path("viewTeamManager")
     @Produces("application/json")
@@ -669,7 +667,7 @@ public class Cpl extends DbConnection {
 
         JSONObject singleObject = null;
         JSONObject jsonObject = null;
-        JSONArray jsonarray=null;
+        JSONArray jsonarray = null;
         PreparedStatement stm = null;
         String status = "OK";
         String message = null;
@@ -682,14 +680,14 @@ public class Cpl extends DbConnection {
             rs = stm.executeQuery(sql);
 
             singleObject = new JSONObject();
-            jsonarray=new JSONArray();
+            jsonarray = new JSONArray();
             while (rs.next()) {
                 message = "Available";
                 singleObject.accumulate("UserName", rs.getString("UserName"));
                 singleObject.accumulate("teamManagerId", rs.getString("teamManagerId"));
                 jsonarray.add(singleObject);
                 singleObject.clear();
-                }
+            }
 
         } catch (Exception ex) {
             status = "Error";
@@ -718,10 +716,11 @@ public class Cpl extends DbConnection {
         }
         return jsonObject.toString();
     }
-@GET
-    @Path("viewTable&{seasonId}")
+
+    @GET
+    @Path("viewPointsTable&{seasonId}")
     @Produces("application/json")
-    public String viewTable(@PathParam("seasonId") int seasonId) {
+    public String viewPointsTable(@PathParam("seasonId") int seasonId) {
 
         PreparedStatement stm = null;
         String sql = null;
@@ -733,7 +732,7 @@ public class Cpl extends DbConnection {
         String message = null;
 
         try {
-           sql = "SELECT  TeamName,sum(play)AS play ,sum(Win) as Win ,sum(Lose) as Lose,sum(Points) as Points FROM PointTable where seasonId = ? Group by TeamName order by points desc;";
+            sql = "SELECT  TeamName,sum(play)AS play ,sum(Win) as Win ,sum(Lose) as Lose,sum(Points) as Points FROM PointTable where seasonId = ? Group by TeamName order by points desc;";
             stm = con().prepareStatement(sql);
             stm.setInt(1, seasonId);
             rs = stm.executeQuery();
@@ -746,7 +745,7 @@ public class Cpl extends DbConnection {
                 singleObject.accumulate("play", rs.getInt("play"));
                 singleObject.accumulate("Win", rs.getInt("Win"));
                 singleObject.accumulate("Lose", rs.getInt("Lose"));
-                singleObject.accumulate("Points", rs.getInt("Points"));           
+                singleObject.accumulate("Points", rs.getInt("Points"));
                 list.add(singleObject);
                 singleObject.clear();
             }
@@ -759,7 +758,7 @@ public class Cpl extends DbConnection {
             jsonObject.accumulate("Status", status);
             jsonObject.accumulate("TimeStamp", timeStamp);
             jsonObject.accumulate("Message", message);
-            jsonObject.accumulate("Players", list);
+            jsonObject.accumulate("PointsTable", list);
             if (con() != null) {
                 try {
                     con().close();
@@ -778,8 +777,8 @@ public class Cpl extends DbConnection {
 
         return jsonObject.toString();
     }
-    
-     @GET
+
+    @GET
     @Path("updatePlayerTeams&{teamId}&{player1}&{player2}&{player3}&{player4}&{player5}&{player6}&{player7}&{player8}&{player9}&{player10}&{player11}&{player12}&{player13}&{player14}&{player15}")
     @Produces("application/json")
     public String updatePlayerTeams(@PathParam("teamId") int teamId, @PathParam("player1") int player1, @PathParam("player2") int player2,
@@ -787,7 +786,7 @@ public class Cpl extends DbConnection {
             @PathParam("player7") int player7, @PathParam("player8") int player8, @PathParam("player9") int player9, @PathParam("player10") int player10,
             @PathParam("player11") int player11, @PathParam("player12") int player12, @PathParam("player13") int player13, @PathParam("player14") int player14,
             @PathParam("player15") int player15) {
-       
+
         JSONObject jsonObject;
         PreparedStatement stmt = null;
         String status = "OK";
@@ -795,7 +794,7 @@ public class Cpl extends DbConnection {
         String sql;
 
         try {
-          
+
             sql = "UPDATE Player set teamId=? where playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=?";
             stmt = con().prepareStatement(sql);
 
@@ -817,12 +816,12 @@ public class Cpl extends DbConnection {
             stmt.setInt(16, player15);
 
             int rs = stmt.executeUpdate();
-           
+
             if (rs > 0) {
                 message = "Players Added";
 
             } else {
-                message = "Error while adding Players";
+                message = "Error";
             }
 
         } catch (Exception ex) {
@@ -853,7 +852,7 @@ public class Cpl extends DbConnection {
         }
         return jsonObject.toString();
     }
-    
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("viewSingleTeamInfo&{teamId}")
@@ -865,7 +864,7 @@ public class Cpl extends DbConnection {
         String result = null;
         JSONObject singleObject = null;
         JSONObject jsonObject = null;
-        JSONArray jsonarry = null;
+        JSONArray jsonarray = null;
         String status = "OK";
         String message = null;
         try {
@@ -875,28 +874,26 @@ public class Cpl extends DbConnection {
             rs = stm.executeQuery();
 
             singleObject = new JSONObject();
-            jsonarry = new JSONArray();
+            jsonarray = new JSONArray();
             while (rs.next()) {
                 message = "Available";
-             
                 singleObject.accumulate("teamName", rs.getString("teamName"));
                 singleObject.accumulate("teamColor", rs.getString("teamColor"));
                 singleObject.accumulate("userName", rs.getString("userName"));
                 singleObject.accumulate("contactNumber", rs.getString("contactNumber"));
-               // singleObject.accumulate("teamId", rs.getInt("teamId"));
-                jsonarry.add(singleObject);
+                jsonarray.add(singleObject);
                 singleObject.clear();
             }
-            
+
         } catch (SQLException ex) {
             status = "Error";
             result = ex.getMessage();
-        }  finally {
+        } finally {
             jsonObject = new JSONObject();
             jsonObject.accumulate("Status", status);
             jsonObject.accumulate("TimeStamp", timeStamp);
-            jsonObject.accumulate("Message", result);
-            jsonObject.accumulate("Teams", jsonarry);
+            jsonObject.accumulate("Message", message);
+            jsonObject.accumulate("Teams", jsonarray);
 
             if (con() != null) {
                 try {
