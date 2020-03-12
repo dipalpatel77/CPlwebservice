@@ -50,8 +50,7 @@ public class LeagueManager extends DbConnection {
             int rs = stm.executeUpdate();
 
             if (rs > 0) {
-                message = " Records have successfully been inserted.";
-                status = "ok";
+                message = "Season Created";
             }
         } catch (SQLException ex) {
             status = "Error";
@@ -104,9 +103,9 @@ public class LeagueManager extends DbConnection {
             int rs = stmt.executeUpdate();
 
             if (rs > 0) {
-                message =  " Record(s) have been successfully inserted.";
+                message =  "Team Created";
             } else {
-                message = " No record Inserted.";
+                message = "Error";
             }
         } catch (Exception ex) {
             status = "Error";
@@ -152,9 +151,9 @@ public class LeagueManager extends DbConnection {
             int rs = stm.executeUpdate();
 
             if (rs > 0) {
-                message =  " Record(s) have been successfully deleted.";
+                message =  "Team Deleted";
             } else {
-                message =  " No record Deleted.";
+                message =  "Error";
             }
 
         } catch (SQLException ex) {
@@ -346,9 +345,9 @@ public class LeagueManager extends DbConnection {
             int rs = stmt.executeUpdate();
 
             if (rs > 0) {
-                message =  " Record(s) have been successfully inserted.";
+                message =  "Team Manager Created";
             } else {
-                message = " No record Inserted.";
+                message = "Error";
             }
         } catch (Exception ex) {
             status = "Error";
