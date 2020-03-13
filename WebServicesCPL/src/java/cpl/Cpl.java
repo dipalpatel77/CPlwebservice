@@ -418,7 +418,6 @@ public class Cpl extends DbConnection {
         PreparedStatement stm = null;
         String sql = null;
         ResultSet rs;
-        String result = null;
         JSONObject singleObject = null;
         JSONObject jsonObject = null;
         JSONArray jsonarry = null;
@@ -443,12 +442,12 @@ public class Cpl extends DbConnection {
 
         } catch (SQLException ex) {
             status = "Error";
-            result = ex.getMessage();
+          message = ex.getMessage();
         } finally {
             jsonObject = new JSONObject();
             jsonObject.accumulate("Status", status);
             jsonObject.accumulate("TimeStamp", timeStamp);
-            jsonObject.accumulate("Message", result);
+            jsonObject.accumulate("Message", message);
             jsonObject.accumulate("Teams", jsonarry);
 
             if (con() != null) {
@@ -476,7 +475,6 @@ public class Cpl extends DbConnection {
         PreparedStatement stm = null;
         String sql = null;
         ResultSet rs;
-        String result = null;
         JSONObject singleObject = null;
         JSONObject jsonObject = null;
         JSONArray jsonArray = null;
@@ -511,12 +509,12 @@ public class Cpl extends DbConnection {
             }
         } catch (SQLException ex) {
             status = "Error";
-            result = ex.getMessage();
+            message = ex.getMessage();
         } finally {
             jsonObject = new JSONObject();
             jsonObject.accumulate("Status", status);
             jsonObject.accumulate("TimeStamp", timeStamp);
-            jsonObject.accumulate("Message", result);
+            jsonObject.accumulate("Message", message);
             jsonObject.accumulate("Matches", jsonArray);
 
             if (con() != null) {
@@ -861,7 +859,6 @@ public class Cpl extends DbConnection {
         PreparedStatement stm = null;
         String sql = null;
         ResultSet rs;
-        String result = null;
         JSONObject singleObject = null;
         JSONObject jsonObject = null;
         JSONArray jsonarray = null;
@@ -887,7 +884,7 @@ public class Cpl extends DbConnection {
 
         } catch (SQLException ex) {
             status = "Error";
-            result = ex.getMessage();
+            message = ex.getMessage();
         } finally {
             jsonObject = new JSONObject();
             jsonObject.accumulate("Status", status);
@@ -912,5 +909,65 @@ public class Cpl extends DbConnection {
         }
         return jsonObject.toString();
     }
+   
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("getCount")
+    public String getCount() {
 
+        PreparedStatement stm = null;
+        String sql = null;
+        ResultSet rs;
+        JSONObject singleObject = null;
+        JSONObject jsonObject = null;
+        JSONArray jsonarry = null;
+        String status = "OK";
+        String message = null;
+        try {
+            sql = "select (select count(*) from Season) as totalSeason,\n" +
+                     "  (select count(*) from Matches) as totalMatches,\n" +
+                     "  (select count(*) from Team) as totalTeam;";
+            stm = con().prepareStatement(sql);
+            
+            rs = stm.executeQuery();
+
+            singleObject = new JSONObject();
+            jsonarry = new JSONArray();
+            while (rs.next()) {
+                message = "Available";
+             
+                singleObject.accumulate("totalSeason", rs.getString("totalSeason"));
+                singleObject.accumulate("totalMatches", rs.getString("totalMatches"));
+                singleObject.accumulate("totalTeam", rs.getString("totalTeam"));
+                jsonarry.add(singleObject);
+                singleObject.clear();
+            }
+            
+        } catch (SQLException ex) {
+            status = "Error";
+            message = ex.getMessage();
+        }  finally {
+            jsonObject = new JSONObject();
+            jsonObject.accumulate("Status", status);
+            jsonObject.accumulate("TimeStamp", timeStamp);
+            jsonObject.accumulate("Message", message);
+            jsonObject.accumulate("Counts", jsonarry);
+
+            if (con() != null) {
+                try {
+                    con().close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (stm != null) {
+                    try {
+                        stm.close();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+        return jsonObject.toString();
+    }
 }

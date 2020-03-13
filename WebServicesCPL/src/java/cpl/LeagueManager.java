@@ -92,20 +92,20 @@ public class LeagueManager extends DbConnection {
         String sql;
         String status = "OK";
         String message = null;
-
+String imgpath="http://stallionsmultiservices.com/CPL/colors/";
         try {
             sql = "insert into Team (teamName,teamColor,teamManagerId) values(?,?,?)";
             stmt = con().prepareStatement(sql);
             stmt.setString(1, teamName);
-            stmt.setString(2, teamColor);
+            stmt.setString(2,imgpath+teamColor+".png");
             stmt.setInt(3, teamManagerId);
 
             int rs = stmt.executeUpdate();
 
             if (rs > 0) {
-                message =  "Team Created";
+                message =  " Record(s) have been successfully inserted.";
             } else {
-                message = "Error";
+                message = " No record Inserted.";
             }
         } catch (Exception ex) {
             status = "Error";
