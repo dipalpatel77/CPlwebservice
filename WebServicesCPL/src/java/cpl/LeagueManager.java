@@ -657,17 +657,13 @@ String imgpath="http://stallionsmultiservices.com/CPL/colors/";
         PreparedStatement stm = null;
         JSONObject jsonObj = null;
         String sql;
-        Connection con = null;
         String status = "OK";
         String message = null;
 
         try {
-            
-            Class.forName("com.mysql.jdbc.Driver");
-            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
-            
+          
             sql = "update TeamManager as tm join User as u on tm.userId=u.userId set u.contactNumber=? where tm.userId=?;";
-            stm = con.prepareStatement(sql);
+            stm = con().prepareStatement(sql);
 
             stm.setString(1, contactNumber);
             stm.setInt(2,userId);
@@ -685,25 +681,23 @@ String imgpath="http://stallionsmultiservices.com/CPL/colors/";
             status = "Error";
             message = ex.getMessage();
 
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(UserLogin.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
+         } finally {
             jsonObj = new JSONObject();
             jsonObj.accumulate("Status", status);
             jsonObj.accumulate("TimeStamp", timeStamp);
             jsonObj.accumulate("Message", message);
 
-            if (con != null) {
+            if (con() != null) {
                 try {
-                    con.close();
+                    con().close();
                 } catch (SQLException ex) {
-                    Logger.getLogger(UserLogin.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 if (stm != null) {
                     try {
                         stm.close();
                     } catch (SQLException ex) {
-                        Logger.getLogger(UserLogin.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             }
