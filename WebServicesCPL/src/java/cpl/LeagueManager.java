@@ -103,9 +103,9 @@ String imgpath="http://stallionsmultiservices.com/CPL/colors/";
             int rs = stmt.executeUpdate();
 
             if (rs > 0) {
-                message =  " Record(s) have been successfully inserted.";
+                message =  "Team created";
             } else {
-                message = " No record Inserted.";
+                message = "Error";
             }
         } catch (Exception ex) {
             status = "Error";
@@ -531,7 +531,6 @@ String imgpath="http://stallionsmultiservices.com/CPL/colors/";
         PreparedStatement stm = null;
         String sql = null;
         ResultSet rs;
-        String result = null;
         JSONObject singleObject=null;
         JSONObject jsonObject = null;
          JSONArray jsonArray=null;
@@ -561,12 +560,11 @@ String imgpath="http://stallionsmultiservices.com/CPL/colors/";
 
         } catch (SQLException ex) {
             status = "Error";
-            result = ex.getMessage();
         } finally {
             jsonObject = new JSONObject();
             jsonObject.accumulate("Status", status);
             jsonObject.accumulate("TimeStamp", timeStamp);
-            jsonObject.accumulate("Message", result);
+            jsonObject.accumulate("Message", message);
             jsonObject.accumulate("Players", jsonArray);  
            
             if (con != null) {

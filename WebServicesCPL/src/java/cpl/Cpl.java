@@ -865,7 +865,7 @@ public class Cpl extends DbConnection {
         String status = "OK";
         String message = null;
         try {
-            sql = "select t.teamName,t.teamColor,u.userName,u.contactNumber from Team as t join TeamManager as tm on t.teamManagerId=tm.teamManagerId join User as u on tm.userId=u.userId where teamId=?";
+            sql = "select tm.teamManagerId,t.teamName,t.teamColor,u.userName,u.contactNumber from Team as t join TeamManager as tm on t.teamManagerId=tm.teamManagerId join User as u on tm.userId=u.userId where teamId=?";
             stm = con().prepareStatement(sql);
             stm.setInt(1, teamId);
             rs = stm.executeQuery();
@@ -878,6 +878,7 @@ public class Cpl extends DbConnection {
                 singleObject.accumulate("teamColor", rs.getString("teamColor"));
                 singleObject.accumulate("userName", rs.getString("userName"));
                 singleObject.accumulate("contactNumber", rs.getString("contactNumber"));
+                singleObject.accumulate("teamManagerId", rs.getInt("teamManagerId"));
                 jsonarray.add(singleObject);
                 singleObject.clear();
             }
