@@ -264,18 +264,16 @@ public class LeagueManager {
     }
 
     @GET
-    @Path("createMatch&{matchNo}&{teamA}&{teamB}&{date}&{venue}&{result}&{resultDescription}&{seasonId}&{teamId}")
+    @Path("createMatch&{teamA}&{teamB}&{date}&{venue}&{result}&{resultDescription}&{seasonId}")
     @Produces(MediaType.APPLICATION_JSON)
     public String createMatch(
-            @PathParam("matchNo") int matchNo,
             @PathParam("teamA") String teamA,
             @PathParam("teamB") String teamB,
             @PathParam("date") String date,
             @PathParam("venue") String venue,
             @PathParam("result") String result,
             @PathParam("resultDescription") String resultDescription,
-            @PathParam("seasonId") int seasonId,
-            @PathParam("teamId") int teamId) {
+            @PathParam("seasonId") int seasonId) {
 
         PreparedStatement stm = null;
         JSONObject jsonObj = null;
@@ -288,18 +286,16 @@ public class LeagueManager {
             Class.forName("com.mysql.cj.jdbc.Driver");
             con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
 
-            sql = "insert into Matches (matchNo,teamA,teamB,date,venue,result,resultDescription,seasonId,teamId) values(?,?,?,?,?,?,?,?,?)";
+            sql = "insert into Matches (teamA,teamB,date,venue,result,resultDescription,seasonId) values(?,?,?,?,?,?,?)";
             stm = con.prepareStatement(sql);
 
-            stm.setInt(1, matchNo);
-            stm.setString(2, teamA);
-            stm.setString(3, teamB);
-            stm.setString(4, date);
-            stm.setString(5, venue);
-            stm.setString(6, result);
-            stm.setString(7, resultDescription);
-            stm.setInt(8, seasonId);
-            stm.setInt(9, teamId);
+            stm.setString(1, teamA);
+            stm.setString(2, teamB);
+            stm.setString(3, date);
+            stm.setString(4, venue);
+            stm.setString(5, result);
+            stm.setString(6, resultDescription);
+            stm.setInt(7, seasonId);
 
             int rs = stm.executeUpdate();
 
