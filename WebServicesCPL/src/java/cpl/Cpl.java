@@ -926,7 +926,7 @@ public class Cpl {
         String message = null;
         Connection con = null;
         try {
-            sql = "select tm.userId,t.teamName,t.teamColor,u.userName,u.contactNumber from Team as t join TeamManager as tm on t.teamManagerId=tm.teamManagerId join User as u on tm.userId=u.userId where teamId=?";
+            sql = "select tm.teamManagerId,tm.userId,t.teamName,t.teamColor,u.userName,u.contactNumber from Team as t join TeamManager as tm on t.teamManagerId=tm.teamManagerId join User as u on tm.userId=u.userId where teamId=?";
             
              Class.forName("com.mysql.cj.jdbc.Driver");
             con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
@@ -938,7 +938,8 @@ public class Cpl {
             jsonarray = new JSONArray();
             while (rs.next()) {
                 message = "Available";
-                singleObject.accumulate("teamManagerUserId",rs.getInt("userId"));
+                singleObject.accumulate("teamManagerUserId",rs.getInt("teamManagerId"));
+                singleObject.accumulate("teamManagerId",rs.getInt("userId"));
                 singleObject.accumulate("teamName", rs.getString("teamName"));
                 singleObject.accumulate("teamColor", rs.getString("teamColor"));
                 singleObject.accumulate("userName", rs.getString("userName"));
