@@ -89,8 +89,8 @@ public class LeagueManager {
             @PathParam("teamManagerId") int teamManagerId) {
 
         JSONObject jsonObject = null;
-        PreparedStatement stmt = null;
-        String sql;
+        PreparedStatement stmt = null,stmt1 = null;
+        String sql,sql1;
         String status = "OK";
         String message = null;
         String imgpath = "http://stallionsmultiservices.com/CPL/colors/";
@@ -101,24 +101,33 @@ public class LeagueManager {
             con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
 
             sql = "insert into Team (teamName,teamColor,teamManagerId) values(?,?,?)";
+           sql1="select max(teamId) as tId from Team";
             stmt = con.prepareStatement(sql);
+            stmt1 = con.prepareStatement(sql1);
             stmt.setString(1, teamName);
             stmt.setString(2, imgpath + teamColor + ".png");
             stmt.setInt(3, teamManagerId);
+             jsonObject = new JSONObject();
 
             int rs = stmt.executeUpdate();
+            ResultSet rs1 = stmt1.executeQuery();
 
             if (rs > 0) {
-                message = " Record(s) have been successfully inserted.";
+                message = "Team Created";
             } else {
-                message = " No record Inserted.";
+                message = "Errors";
+            }
+            
+             while (rs1.next()) {
+              jsonObject.accumulate("TeamID",rs1.getInt("tId"));
+                      
             }
         } catch (Exception ex) {
             status = "Error";
             message = ex.getMessage();
 
         } finally {
-            jsonObject = new JSONObject();
+           
             jsonObject.accumulate("Status", status);
             jsonObject.accumulate("TimeStamp", timeStamp);
             jsonObject.accumulate("Message", message);
@@ -557,7 +566,6 @@ public class LeagueManager {
         PreparedStatement stm = null;
         String sql = null;
         ResultSet rs;
-        String result = null;
         JSONObject singleObject = null;
         JSONObject jsonObject = null;
         JSONArray jsonArray = null;
@@ -590,14 +598,14 @@ public class LeagueManager {
 
         } catch (SQLException ex) {
             status = "Error";
-            result = ex.getMessage();
+            message = ex.getMessage();
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(LeagueManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             jsonObject = new JSONObject();
             jsonObject.accumulate("Status", status);
             jsonObject.accumulate("TimeStamp", timeStamp);
-            jsonObject.accumulate("Message", result);
+            jsonObject.accumulate("Message", message);
             jsonObject.accumulate("Players", jsonArray);
 
             if (con != null) {
