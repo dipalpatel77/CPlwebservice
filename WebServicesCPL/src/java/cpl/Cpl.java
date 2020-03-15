@@ -1,11 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cpl;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,14 +16,14 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 @Path("main")
-public class Cpl extends DbConnection {
+public class Cpl {
 
     private final long timeStamp = System.currentTimeMillis() / 1000;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("userLogin&{userType}&{userEmail}&{userPass}")
-    public String userLogin(@PathParam("userType") String userType, @PathParam("userEmail") String userEmail, @PathParam("userPass") String userPass) {
+    public String userLogin(@PathParam("userType") String userType, @PathParam("userEmail") String userEmail, @PathParam("userPass") String userPass) throws ClassNotFoundException {
 
         PreparedStatement stm = null;
         String sql = null;
@@ -36,6 +32,7 @@ public class Cpl extends DbConnection {
         String message = "Login Failed";
         JSONObject jsonObject = null;
         String status = "OK";
+        Connection con = null;
 
         try {
             if (userType.equalsIgnoreCase("LeagueManager")) {
@@ -43,7 +40,9 @@ public class Cpl extends DbConnection {
             } else {
                 sql = "Select tm.userId from TeamManager tm join User u ON tm.userId = u.userId where u.email=? && u.password=?";
             }
-            stm = con().prepareStatement(sql);
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+            stm = con.prepareStatement(sql);
             stm.setString(1, userEmail);
             stm.setString(2, userPass);
             rs = stm.executeQuery();
@@ -62,9 +61,9 @@ public class Cpl extends DbConnection {
             jsonObject.accumulate("TimeStamp", timeStamp);
             jsonObject.accumulate("Message", message);
             jsonObject.accumulate("UserId", userId);
-            if (con() != null) {
+            if (con != null) {
                 try {
-                    con().close();
+                    con.close();
                 } catch (SQLException ex) {
                     Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -83,7 +82,7 @@ public class Cpl extends DbConnection {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("verifyUser&{userEmail}&{dob}")
-    public String verifyUser(@PathParam("userEmail") String userEmail, @PathParam("dob") String dob) {
+    public String verifyUser(@PathParam("userEmail") String userEmail, @PathParam("dob") String dob) throws ClassNotFoundException {
 
         PreparedStatement stm = null;
         String sql = null;
@@ -92,12 +91,15 @@ public class Cpl extends DbConnection {
         String message = "Invalid User";
         JSONObject jsonObject = null;
         String status = "OK";
+         Connection con = null;
 
         try {
 
             sql = "Select userId from User where email=? && dob=?";
-
-            stm = con().prepareStatement(sql);
+           
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+            stm = con.prepareStatement(sql);
             stm.setString(1, userEmail);
             stm.setString(2, dob);
             rs = stm.executeQuery();
@@ -116,9 +118,9 @@ public class Cpl extends DbConnection {
             jsonObject.accumulate("TimeStamp", timeStamp);
             jsonObject.accumulate("Message", message);
             jsonObject.accumulate("UserId", userId);
-            if (con() != null) {
+            if (con != null) {
                 try {
-                    con().close();
+                    con.close();
                 } catch (SQLException ex) {
                     Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -146,10 +148,12 @@ public class Cpl extends DbConnection {
         String message = null;
         JSONObject jsonObject = null;
         String status = "OK";
-
+         Connection con = null;
         try {
             sql = "update User set password=? where userId=?";
-            stm = con().prepareStatement(sql);
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+            stm = con.prepareStatement(sql);
             stm.setString(1, newPassword);
             stm.setInt(2, userId);
             rs = stm.executeUpdate();
@@ -171,9 +175,9 @@ public class Cpl extends DbConnection {
             jsonObject.accumulate("TimeStamp", timeStamp);
             jsonObject.accumulate("Message", message);
 
-            if (con() != null) {
+            if (con != null) {
                 try {
-                    con().close();
+                    con.close();
                 } catch (SQLException ex) {
                     Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -194,16 +198,20 @@ public class Cpl extends DbConnection {
     @Produces(MediaType.APPLICATION_JSON)
     public String sendFeedback(@PathParam("title") String title, @PathParam("description") String description,
             @PathParam("email") String email) {
-
         PreparedStatement stm = null;
         String sql = null;
         JSONObject jsonObject = null;
         String status = "OK";
         String message = null;
-
+         Connection con = null;
+        
         try {
             sql = "insert into Feedback (title, description, email) values(?,?,?)";
-            stm = con().prepareStatement(sql);
+            
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+            sql = "update User set password=? where userId=?";
+            stm = con.prepareStatement(sql);
             stm.setString(1, title);
             stm.setString(2, description);
             stm.setString(3, email);
@@ -218,15 +226,17 @@ public class Cpl extends DbConnection {
         } catch (SQLException ex) {
             status = "Error";
             message = ex.getMessage();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             jsonObject = new JSONObject();
             jsonObject.accumulate("Status", status);
             jsonObject.accumulate("TimeStamp", timeStamp);
             jsonObject.accumulate("Message", message);
 
-            if (con() != null) {
+            if (con != null) {
                 try {
-                    con().close();
+                    con.close();
                 } catch (SQLException ex) {
                     Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -253,12 +263,17 @@ public class Cpl extends DbConnection {
         String message = null;
         String status = "OK";
         JSONObject singleObject = null;
+        Connection con = null;
 
         try {
-
+            
             sql = "Select * from Player where playerName LIKE ? ";
-            stm = con().prepareStatement(sql);
-            stm.setString(1, playerName + "%");
+            
+           
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+             stm = con.prepareStatement(sql);
+             stm.setString(1, playerName + "%");
             ResultSet rs = stm.executeQuery();
 
             singleObject = new JSONObject();
@@ -286,9 +301,9 @@ public class Cpl extends DbConnection {
             jsonObject.accumulate("Message", message);
             jsonObject.accumulate("Player Details", list);
 
-            if (con() != null) {
+            if (con != null) {
                 try {
-                    con().close();
+                    con.close();
                 } catch (SQLException ex) {
                     Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -315,11 +330,15 @@ public class Cpl extends DbConnection {
         String status = "OK";
         String message = null;
         String sql;
+        Connection con = null;
         ResultSet rs;
 
         try {
             sql = "Select * from Player where playerId=?";
-            stm = con().prepareStatement(sql);
+             
+             Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+            stm = con.prepareStatement(sql);
             stm.setInt(1, playerId);
             rs = stm.executeQuery();
 
@@ -344,9 +363,9 @@ public class Cpl extends DbConnection {
             jsonObject.accumulate("TimeStamp", timeStamp);
             jsonObject.accumulate("Message", message);
             jsonObject.accumulate("Player Details", singleObject);
-            if (con() != null) {
+            if (con != null) {
                 try {
-                    con().close();
+                    con.close();
                 } catch (SQLException ex) {
                     Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -374,11 +393,15 @@ public class Cpl extends DbConnection {
         String status = "OK";
         JSONObject jsonObject = null;
         PreparedStatement stmt = null;
+        Connection con = null;
 
         try {
             String sql;
             sql = "Update Team set teamName=?,teamColor=?,teamManagerId=? where teamId=?";
-            stmt = con().prepareStatement(sql);
+             
+             Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+            stmt = con.prepareStatement(sql);
             stmt.setString(1, teamName);
             stmt.setString(2, teamColor);
             stmt.setInt(3, teamManagerId);
@@ -400,7 +423,7 @@ public class Cpl extends DbConnection {
             jsonObject.accumulate("TimeStamp ", timeStamp);
             jsonObject.accumulate("Message :", msg);
             try {
-                con().close();
+                con.close();
             } catch (SQLException ex) {
                 Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -423,9 +446,13 @@ public class Cpl extends DbConnection {
         JSONArray jsonarry = null;
         String status = "OK";
         String message = null;
+        Connection con = null;
         try {
             sql = "Select * from Team";
-            stm = con().prepareStatement(sql);
+            
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+            stm = con.prepareStatement(sql);
             rs = stm.executeQuery();
 
             singleObject = new JSONObject();
@@ -443,6 +470,8 @@ public class Cpl extends DbConnection {
         } catch (SQLException ex) {
             status = "Error";
           message = ex.getMessage();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             jsonObject = new JSONObject();
             jsonObject.accumulate("Status", status);
@@ -450,9 +479,9 @@ public class Cpl extends DbConnection {
             jsonObject.accumulate("Message", message);
             jsonObject.accumulate("Teams", jsonarry);
 
-            if (con() != null) {
+            if (con!= null) {
                 try {
-                    con().close();
+                    con.close();
                 } catch (SQLException ex) {
                     Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -480,11 +509,15 @@ public class Cpl extends DbConnection {
         JSONArray jsonArray = null;
         String status = "OK";
         String message = null;
+        Connection con = null;
 
         try {
 
             sql = "select * from Matches where seasonId=? order by date asc";
-            stm = con().prepareStatement(sql);
+             
+             Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+            stm = con.prepareStatement(sql);
             stm.setInt(1, seasonId);
             rs = stm.executeQuery();
 
@@ -510,6 +543,8 @@ public class Cpl extends DbConnection {
         } catch (SQLException ex) {
             status = "Error";
             message = ex.getMessage();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             jsonObject = new JSONObject();
             jsonObject.accumulate("Status", status);
@@ -517,9 +552,9 @@ public class Cpl extends DbConnection {
             jsonObject.accumulate("Message", message);
             jsonObject.accumulate("Matches", jsonArray);
 
-            if (con() != null) {
+            if (con != null) {
                 try {
-                    con().close();
+                    con.close();
                 } catch (SQLException ex) {
                     Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -547,10 +582,14 @@ public class Cpl extends DbConnection {
         JSONArray jsonArray = null;
         String status = "OK";
         String message = null;
+         Connection con = null;
 
         try {
             sql = "Select * from Season order by startDate desc";
-            stm = con().prepareStatement(sql);
+            
+             Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+            stm = con.prepareStatement(sql);
             rs = stm.executeQuery();
 
             singleObject = new JSONObject();
@@ -569,6 +608,8 @@ public class Cpl extends DbConnection {
         } catch (SQLException ex) {
             status = "Error";
             message = ex.getMessage();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             jsonObject = new JSONObject();
             jsonObject.accumulate("Status", status);
@@ -576,9 +617,9 @@ public class Cpl extends DbConnection {
             jsonObject.accumulate("Message", message);
             jsonObject.accumulate("Seasons", jsonArray);
 
-            if (con() != null) {
+            if (con != null) {
                 try {
-                    con().close();
+                    con.close();
                 } catch (SQLException ex) {
                     Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -607,10 +648,14 @@ public class Cpl extends DbConnection {
         JSONArray list = null;
         String status = "OK";
         String message = null;
+         Connection con = null;
 
         try {
             sql = "Select * from Player where teamId=?";
-            stm = con().prepareStatement(sql);
+            
+             Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+            stm = con.prepareStatement(sql);
             stm.setInt(1, teamId);
             rs = stm.executeQuery();
             singleObject = new JSONObject();
@@ -633,15 +678,17 @@ public class Cpl extends DbConnection {
         } catch (SQLException ex) {
             status = "Error";
             message = ex.getMessage();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             jsonObject = new JSONObject();
             jsonObject.accumulate("Status", status);
             jsonObject.accumulate("TimeStamp", timeStamp);
             jsonObject.accumulate("Message", message);
             jsonObject.accumulate("Players", list);
-            if (con() != null) {
+            if (con != null) {
                 try {
-                    con().close();
+                    con.close();
                 } catch (SQLException ex) {
                     Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -671,10 +718,14 @@ public class Cpl extends DbConnection {
         String message = null;
         String sql;
         ResultSet rs;
+        Connection con = null;
 
         try {
             sql = "select UserName,teamManagerId from TeamManager t ,User u WHERE t.userId = u.userId";
-            stm = con().prepareStatement(sql);
+             
+             Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+            stm = con.prepareStatement(sql);
             rs = stm.executeQuery(sql);
 
             singleObject = new JSONObject();
@@ -697,9 +748,9 @@ public class Cpl extends DbConnection {
             jsonObject.accumulate("TimeStamp", timeStamp);
             jsonObject.accumulate("Message", message);
             jsonObject.accumulate("TeamManagers", jsonarray);
-            if (con() != null) {
+            if (con != null) {
                 try {
-                    con().close();
+                    con.close();
                 } catch (SQLException ex) {
                     Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -728,10 +779,13 @@ public class Cpl extends DbConnection {
         JSONArray list = null;
         String status = "OK";
         String message = null;
-
+        Connection con = null;
         try {
             sql = "SELECT  TeamName,sum(play)AS play ,sum(Win) as Win ,sum(Lose) as Lose,sum(Points) as Points FROM PointTable where seasonId = ? Group by TeamName order by points desc;";
-            stm = con().prepareStatement(sql);
+            
+             Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+            stm = con.prepareStatement(sql);
             stm.setInt(1, seasonId);
             rs = stm.executeQuery();
             singleObject = new JSONObject();
@@ -751,15 +805,17 @@ public class Cpl extends DbConnection {
         } catch (SQLException ex) {
             status = "Error";
             message = ex.getMessage();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             jsonObject = new JSONObject();
             jsonObject.accumulate("Status", status);
             jsonObject.accumulate("TimeStamp", timeStamp);
             jsonObject.accumulate("Message", message);
             jsonObject.accumulate("PointsTable", list);
-            if (con() != null) {
+            if (con != null) {
                 try {
-                    con().close();
+                    con.close();
                 } catch (SQLException ex) {
                     Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -790,11 +846,15 @@ public class Cpl extends DbConnection {
         String status = "OK";
         String message = null;
         String sql;
+        Connection con = null;
 
         try {
 
             sql = "UPDATE Player set teamId=? where playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=? OR playerId=?";
-            stmt = con().prepareStatement(sql);
+           
+             Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+            stmt = con.prepareStatement(sql);
 
             stmt.setInt(1, teamId);
             stmt.setInt(2, player1);
@@ -833,9 +893,9 @@ public class Cpl extends DbConnection {
             jsonObject.accumulate("TimeStamp", timeStamp);
             jsonObject.accumulate("Message", message);
 
-            if (con() != null) {
+            if (con != null) {
                 try {
-                    con().close();
+                    con.close();
                 } catch (SQLException ex) {
                     Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -864,9 +924,13 @@ public class Cpl extends DbConnection {
         JSONArray jsonarray = null;
         String status = "OK";
         String message = null;
+        Connection con = null;
         try {
-            sql = "select tm.teamManagerId,t.teamName,t.teamColor,u.userName,u.contactNumber from Team as t join TeamManager as tm on t.teamManagerId=tm.teamManagerId join User as u on tm.userId=u.userId where teamId=?";
-            stm = con().prepareStatement(sql);
+            sql = "select tm.userId,t.teamName,t.teamColor,u.userName,u.contactNumber from Team as t join TeamManager as tm on t.teamManagerId=tm.teamManagerId join User as u on tm.userId=u.userId where teamId=?";
+            
+             Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+            stm = con.prepareStatement(sql);
             stm.setInt(1, teamId);
             rs = stm.executeQuery();
 
@@ -874,11 +938,11 @@ public class Cpl extends DbConnection {
             jsonarray = new JSONArray();
             while (rs.next()) {
                 message = "Available";
+                singleObject.accumulate("teamManagerUserId",rs.getInt("userId"));
                 singleObject.accumulate("teamName", rs.getString("teamName"));
                 singleObject.accumulate("teamColor", rs.getString("teamColor"));
                 singleObject.accumulate("userName", rs.getString("userName"));
                 singleObject.accumulate("contactNumber", rs.getString("contactNumber"));
-                singleObject.accumulate("teamManagerId", rs.getInt("teamManagerId"));
                 jsonarray.add(singleObject);
                 singleObject.clear();
             }
@@ -886,6 +950,8 @@ public class Cpl extends DbConnection {
         } catch (SQLException ex) {
             status = "Error";
             message = ex.getMessage();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             jsonObject = new JSONObject();
             jsonObject.accumulate("Status", status);
@@ -893,9 +959,9 @@ public class Cpl extends DbConnection {
             jsonObject.accumulate("Message", message);
             jsonObject.accumulate("Teams", jsonarray);
 
-            if (con() != null) {
+            if (con != null) {
                 try {
-                    con().close();
+                    con.close();
                 } catch (SQLException ex) {
                     Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -924,11 +990,14 @@ public class Cpl extends DbConnection {
         JSONArray jsonarry = null;
         String status = "OK";
         String message = null;
+        Connection con = null;
         try {
             sql = "select (select count(*) from Season) as totalSeason,\n" +
                      "  (select count(*) from Matches) as totalMatches,\n" +
                      "  (select count(*) from Team) as totalTeam;";
-            stm = con().prepareStatement(sql);
+             Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://198.71.227.97:3306/cpl", "mahesh", "eQa2j#78");
+            stm = con.prepareStatement(sql);
             
             rs = stm.executeQuery();
 
@@ -947,6 +1016,8 @@ public class Cpl extends DbConnection {
         } catch (SQLException ex) {
             status = "Error";
             message = ex.getMessage();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
         }  finally {
             jsonObject = new JSONObject();
             jsonObject.accumulate("Status", status);
@@ -954,9 +1025,9 @@ public class Cpl extends DbConnection {
             jsonObject.accumulate("Message", message);
             jsonObject.accumulate("Counts", jsonarry);
 
-            if (con() != null) {
+            if (con != null) {
                 try {
-                    con().close();
+                    con.close();
                 } catch (SQLException ex) {
                     Logger.getLogger(Cpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
